@@ -1,0 +1,90 @@
+# KREVA 空き家 取り込みパイプライン（定期実行）
+#
+# 何をするか：
+#   scrapers（住まいる岡山・井原Life・高梁公式）で収集
+#   → 不動産情報ライブラリAPIで周辺情報を付加（--enrich）
+#   → kreva.co.jp の WordPress へ upsert（--push）
+#
+# 前提（リポジトリの Settings → Secrets and variables → Actions に登録）：
+#   REINFOLIB_API_KEY … 不動産情報ライブラリAPIキー
+#   WP_BASE_URL        … https://kreva.co.jp
+#   WP_USER            … WordPressユーザー名
+#   WP_APP_PASSWORD    … アプリケーションパスワード
+#
+# 頻度：週1回（月曜 03:00 JST）。空き家バンクの更新頻度に合わせ低頻度＝ガードレール準拠。
+# 手動実行（workflow_dispatch）ではドライランも選べる。
+
+name: akiya-ingest
+
+on:
+  schedule:
+    - cron: "0 18 * * 0"   # 日曜18:00 UTC = 月曜03:00 JST
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "取り込み元"
+        type: choice
+        options: [all, ok_smile, ibaragurashi, takahashi]
+        default: all
+      cities:
+        description: "対象自治体（priority / all / カンマ区切りコード）"
+        type: string
+        default: all
+      push:
+        description: "WordPressへ投入する（falseならドライラン）"
+        type: boolean
+        default: true
+      limit:
+        description: "自治体あたり最大件数（動作確認用・空なら無制限）"
+        type: string
+        default: ""
+
+concurrency:
+  group: akiya-ingest          # 前回実行中は重ねて走らせない（対象サイトへの負荷防止）
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120       # 全県＋エンリッチで長め。2秒間隔スクレイプ＋API待ちを見込む
+    defaults:
+      run:
+        working-directory: ingest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ingest/requirements.txt
+
+      - name: 依存インストール
+        run: pip install -r requirements.txt
+
+      - name: 取り込み実行
+        env:
+          REINFOLIB_API_KEY: ${{ secrets.REINFOLIB_API_KEY }}
+          WP_BASE_URL: ${{ secrets.WP_BASE_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+          SOURCE="${{ github.event.inputs.source || 'all' }}"
+          CITIES="${{ github.event.inputs.cities || 'all' }}"
+          PUSH="${{ github.event.inputs.push || 'true' }}"
+          LIMIT="${{ github.event.inputs.limit }}"
+          ARGS="--source $SOURCE --cities $CITIES --enrich"
+          if [ "$PUSH" = "true" ]; then ARGS="$ARGS --push"; else ARGS="$ARGS --dry-run"; fi
+          if [ -n "$LIMIT" ]; then ARGS="$ARGS --limit $LIMIT"; fi
+          echo "実行: python run_ingest.py $ARGS"
+          python run_ingest.py $ARGS
+
+      - name: 収集結果JSONを保存（デバッグ用・30日保持）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingest-output-${{ github.run_number }}
+          path: ingest/out/*.json
+          retention-days: 30
+          if-no-files-found: warn

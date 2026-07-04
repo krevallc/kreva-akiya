@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KREVA 空き家 詳細プレビュー（自動付加項目の見え方）</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="../assets/css/akiya.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif}
+.demo-note{max-width:1100px;margin:12px auto 0;padding:8px 12px;background:#fff8e6;border:1px solid #f0d999;border-radius:8px;font-size:.85rem;color:#7a5b00}
+.auto-badge{display:inline-block;background:#2e7d32;color:#fff;font-size:.62rem;padding:0 5px;border-radius:3px;margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="demo-note">これは<strong>詳細ページの静的プレビュー</strong>です。<span class="auto-badge">自動</span>が付いた項目が「①API/地図で全物件に自動付加される情報」。地図のハザード（右上レイヤ）は本物の国土地理院データ。サンプル値は仮です。</div>
+
+<article class="kakiya-single">
+  <div class="kakiya-badge">KREVA セレクト物件（リノベ）</div>
+  <h1 class="kakiya-title">総社市中央の空き家（KREVAリノベ済）</h1>
+  <p class="kakiya-address">岡山県総社市中央一丁目1-1</p>
+  <p class="kakiya-price-lg">880万円</p>
+
+  <div class="kakiya-single-grid">
+    <div class="kakiya-single-left">
+      <div class="kakiya-photo" style="background:#eee;height:260px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#999">物件写真（サンプル）</div>
+
+      <section>
+        <h2>物件概要</h2>
+        <table class="kakiya-spec"><tbody>
+          <tr><th>価格</th><td>880万円</td></tr>
+          <tr><th>所在地</th><td>岡山県総社市中央一丁目1-1</td></tr>
+          <tr><th>土地面積</th><td>182.5 m²</td></tr>
+          <tr><th>建物面積</th><td>96.4 m²</td></tr>
+          <tr><th>間取り</th><td>4LDK</td></tr>
+          <tr><th>構造</th><td>木造2階</td></tr>
+          <tr><th>築年</th><td>1998 年</td></tr>
+          <tr><th>耐震(推定)<span class="auto-badge">自動</span></th><td><span class="kakiya-hazard-none">新耐震（推定）</span> <span class="kakiya-note">1981年6月の新耐震基準以降の築年</span></td></tr>
+        </tbody></table>
+      </section>
+
+      <section>
+        <h2>用途・規制<span class="auto-badge">自動</span></h2>
+        <table class="kakiya-spec"><tbody>
+          <tr><th>区域区分</th><td>市街化区域</td></tr>
+          <tr><th>用途地域</th><td>第一種住居地域</td></tr>
+          <tr><th>建蔽率/容積率</th><td>60% / 200%</td></tr>
+        </tbody></table>
+      </section>
+
+      <section>
+        <h2>災害リスク<span class="auto-badge">自動</span></h2>
+        <p class="kakiya-hazard-none">主要ハザードの指定区域に該当なし（下の地図で周辺も確認できます）。</p>
+        <p>液状化傾向：<strong>低い</strong></p>
+        <p class="kakiya-note">地図右上のレイヤ切替で 洪水／土砂／津波／高潮 を重ねて確認できます。</p>
+      </section>
+
+      <section>
+        <h2>生活・周辺<span class="auto-badge">自動</span></h2>
+        <table class="kakiya-spec"><tbody>
+          <tr><th>学区</th><td>小: 総社小学校／中: 総社中学校</td></tr>
+          <tr><th>最寄り医療機関</th><td>総社中央病院（約620m）</td></tr>
+          <tr><th>最寄り保育/幼稚園</th><td>中央保育所（約400m）</td></tr>
+          <tr><th>最寄り避難場所</th><td>総社小学校 体育館（約550m）</td></tr>
+          <tr><th>将来人口(参考)</th><td>2050年に約-18%（250mメッシュ推計）</td></tr>
+        </tbody></table>
+        <p class="kakiya-note">学区・周辺施設・将来人口は国土交通省 不動産情報ライブラリのデータに基づく参考値です。</p>
+      </section>
+    </div>
+
+    <aside class="kakiya-single-right">
+      <div id="kakiya-map-single" style="height:300px;border-radius:10px;border:1px solid #ddd"></div>
+
+      <div class="kakiya-relard">
+        <h3>相場の目安<span class="auto-badge">自動</span></h3>
+        <p>最寄りの地価（公示/調査）：<strong>82,000 円/m²</strong>（約210m先）</p>
+        <p>固定資産税（土地分の概算）：<strong>年 約26,700 円</strong>
+          <span class="kakiya-note">住宅用地特例1/6・標準税率1.4%で試算。建物分・都市計画税は含まず、桁感の目安です。</span></p>
+      </div>
+
+      <div class="kakiya-cta-box">
+        <h3>この物件についてKREVAに相談</h3>
+        <p>購入・見学・活用（リノベ/民泊）のご相談を承ります。</p>
+        <a class="kakiya-btn kakiya-btn-primary" href="mailto:info@kreva.co.jp">メールで相談する</a>
+      </div>
+
+      <div class="kakiya-source">
+        <h3>出典・最終確認</h3>
+        <p>出典：住まいる岡山<br><a href="#">元の掲載ページを見る ↗</a><br>最終確認日：2026-07-03</p>
+        <p class="kakiya-note">最新・正確な情報は必ず元の掲載元でご確認ください。</p>
+      </div>
+    </aside>
+  </div>
+</article>
+
+<script>
+var HAZARD=[
+ ["洪水浸水想定（想定最大規模）","https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png"],
+ ["土砂災害警戒（土石流）","https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/{z}/{x}/{y}.png"],
+ ["土砂災害警戒（急傾斜地の崩壊）","https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki/{z}/{x}/{y}.png"],
+ ["津波浸水想定","https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/{z}/{x}/{y}.png"],
+ ["高潮浸水想定","https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/{z}/{x}/{y}.png"]
+];
+document.addEventListener('DOMContentLoaded',function(){
+  var lat=34.673176,lng=133.747147;
+  var pale=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",{attribution:"地理院タイル",maxZoom:18});
+  var map=L.map("kakiya-map-single",{center:[lat,lng],zoom:16,layers:[pale]});
+  var ov={};HAZARD.forEach(function(h){ov[h[0]]=L.tileLayer(h[1],{opacity:.6,maxNativeZoom:17,maxZoom:18});});
+  L.control.layers(null,ov,{collapsed:false}).addTo(map);
+  L.control.attribution({prefix:false}).addAttribution("ハザード: 国土地理院 重ねるハザードマップ ／ 規制・地価: 国土交通省 不動産情報ライブラリ").addTo(map);
+  L.marker([lat,lng]).addTo(map).bindPopup("<strong>総社市中央一丁目1-1</strong><br>区域区分: 市街化区域<br>用途地域: 第一種住居地域").openPopup();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# 機密・生成物はコミットしない
+ingest/.env
+ingest/out/
+ingest/.venv/
+ingest/venv/
+__pycache__/
+*.pyc
+.DS_Store
