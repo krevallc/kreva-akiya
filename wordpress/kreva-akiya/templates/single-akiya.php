@@ -161,11 +161,15 @@ while ( have_posts() ) :
 				<?php if ( get_the_content() ) : ?>
 					<section><h2>説明</h2><div class="kakiya-body"><?php the_content(); ?></div></section>
 				<?php endif; ?>
+
+				<section>
+					<h2>周辺地図・災害ハザード</h2>
+					<div id="kakiya-map-single" role="application" aria-label="物件周辺の地図とハザード"></div>
+					<p class="kakiya-note">地図右のレイヤ切替で 洪水／土砂／津波／高潮 を重ねて確認できます。</p>
+				</section>
 			</div>
 
 			<aside class="kakiya-single-right">
-				<div id="kakiya-map-single" role="application" aria-label="物件周辺の地図とハザード"></div>
-
 				<div class="kakiya-relard">
 					<h3>相場の目安</h3>
 					<?php if ( $m['chika_price'] ) : ?>
