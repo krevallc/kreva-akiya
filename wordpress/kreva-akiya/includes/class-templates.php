@@ -13,6 +13,29 @@ class KREVA_Akiya_Templates {
 
 	public function hooks() {
 		add_filter( 'template_include', array( $this, 'template_include' ) );
+		add_action( 'admin_init', array( $this, 'register_home_setting' ) );
+	}
+
+	/**
+	 * 設定 → 一般 に「HOMEに空き家検索を表示」チェックボックスを追加。
+	 * 空き家検索サービスの正式公開時にONにすると、HOMEのヒーローCTA・実績チップ・
+	 * フラッグシップセクション・事業カードに空き家検索が表示される。
+	 */
+	public function register_home_setting() {
+		register_setting( 'general', 'kreva_akiya_home_live', array(
+			'type'              => 'boolean',
+			'sanitize_callback' => function ( $v ) { return $v ? 1 : 0; },
+			'default'           => 0,
+		) );
+		add_settings_field(
+			'kreva_akiya_home_live',
+			'空き家検索の公開',
+			function () {
+				$v = get_option( 'kreva_akiya_home_live', 0 );
+				echo '<label><input type="checkbox" name="kreva_akiya_home_live" value="1" ' . checked( $v, 1, false ) . '> HOMEに「岡山県の空き家検索」を表示する（正式公開時にON）</label>';
+			},
+			'general'
+		);
 	}
 
 	public function template_include( $template ) {
