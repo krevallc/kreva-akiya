@@ -5,7 +5,8 @@
 	var CFG = window.KREVA_AKIYA || {};
 	if (!window.L || !document.getElementById('kakiya-map')) return;
 
-	var map, markersLayer, byId = {};
+	var PAGE_SIZE = 20; // リスト初期表示件数（「さらに表示」で20件ずつ追加）
+	var map, markersLayer, byId = {}, allItems = [], shownCount = 0;
 
 	function baseLayers() {
 		var out = {};
@@ -67,22 +68,24 @@
 	}
 
 	function render(items) {
+		allItems = items;
+		shownCount = 0;
 		markersLayer.clearLayers();
 		byId = {};
 		var cards = document.getElementById('kakiya-cards');
 		cards.innerHTML = '';
-		if (!items.length) { cards.innerHTML = '<p class="kakiya-empty">条件に合う物件がありません。</p>'; return; }
+		if (!items.length) { updateMoreBtn(); cards.innerHTML = '<p class="kakiya-empty">条件に合う物件がありません。</p>'; return; }
 
 		var bounds = [];
 		items.forEach(function (it) {
-			var m = L.marker([it.lat, it.lng], it.is_kreva ? { title: it.title, riseOnHover: true } : { title: it.title });
-			m.bindPopup(popupHtml(it));
+			var m = L.marker([it.lat, it.lng], { title: it.title, riseOnHover: !!it.is_kreva });
+			m.bindPopup(popupHtml(it), { minWidth: 220 });
 			m.on('click', function () { highlightCard(it.id); });
 			m.addTo(markersLayer);
 			byId[it.id] = m;
 			bounds.push([it.lat, it.lng]);
-			cards.appendChild(cardEl(it));
 		});
+		appendCards();
 		if (bounds.length) {
 			// 左側の絞り込みオーバーレイに隠れないよう左余白を広めに
 			var wideLayout = window.innerWidth > 700;
@@ -94,12 +97,42 @@
 		}
 	}
 
+	// リストに次のPAGE_SIZE件を追加表示
+	function appendCards() {
+		var cards = document.getElementById('kakiya-cards');
+		allItems.slice(shownCount, shownCount + PAGE_SIZE).forEach(function (it) {
+			cards.appendChild(cardEl(it));
+		});
+		shownCount = Math.min(shownCount + PAGE_SIZE, allItems.length);
+		updateMoreBtn();
+	}
+
+	function updateMoreBtn() {
+		var old = document.getElementById('kakiya-more');
+		if (old) old.remove();
+		if (shownCount < allItems.length) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.id = 'kakiya-more';
+			b.className = 'kakiya-btn kakiya-more';
+			b.textContent = 'さらに表示（残り ' + (allItems.length - shownCount) + ' 件）';
+			b.addEventListener('click', appendCards);
+			var cards = document.getElementById('kakiya-cards');
+			cards.parentNode.insertBefore(b, cards.nextSibling);
+		}
+	}
+
+	// ピンのポップアップ＝カード風。全体クリックで物件詳細へ
 	function popupHtml(it) {
-		var badge = it.is_kreva ? '<span class="kakiya-pin-badge">KREVA</span>' : '';
-		return '<div class="kakiya-pop">' + badge +
-			'<strong>' + esc(it.title) + '</strong><br>' +
-			esc(it.price_label || '') + (it.city ? ' / ' + esc(it.city) : '') + '<br>' +
-			'<a href="' + esc(it.permalink) + '">詳細を見る →</a></div>';
+		var img = it.thumb
+			? '<img class="kakiya-pop-img" referrerpolicy="no-referrer" src="' + esc(it.thumb) + '" alt="" onerror="this.style.display=\'none\'">'
+			: '';
+		return '<a class="kakiya-pop-card" href="' + esc(it.permalink) + '">' + img +
+			(it.is_kreva ? '<span class="kakiya-pin-badge">KREVA</span>' : '') +
+			'<span class="kakiya-pop-price">' + esc(it.price_label || '') + '</span>' +
+			'<span class="kakiya-pop-title">' + esc(it.title) + '</span>' +
+			'<span class="kakiya-pop-meta">' + esc([it.city, it.type].filter(Boolean).join(' / ')) + '</span>' +
+			'<span class="kakiya-pop-link">詳細を見る →</span></a>';
 	}
 
 	// 写真が無い物件用：物件位置を中心にした地理院タイルの地図サムネを生成
@@ -108,7 +141,7 @@
 		var px = (lng + 180) / 360 * n * 256;
 		var latRad = lat * Math.PI / 180;
 		var py = (1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2 * n * 256;
-		var half = 170, halfH = 65; // 想定最大カード幅340px・高さ130pxぶんのタイルを敷く
+		var half = 170, halfH = 80; // 想定最大サムネ幅340px・高さ160pxぶんのタイルを敷く
 		var tiles = '';
 		var x0 = Math.floor((px - half) / 256), x1 = Math.floor((px + half) / 256);
 		var y0 = Math.floor((py - halfH) / 256), y1 = Math.floor((py + halfH) / 256);

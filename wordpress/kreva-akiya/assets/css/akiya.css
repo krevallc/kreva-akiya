@@ -32,13 +32,26 @@
 .kakiya-main { min-width: 0; }
 #kakiya-map { height: 460px; border-radius: 10px; border: 1px solid #ddd; }
 
-.kakiya-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
-.kakiya-card { display: flex; flex-direction: column; border: 1px solid #e3e3df; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; background: #fff; transition: box-shadow .15s, transform .15s; }
-.kakiya-card:hover, .kakiya-card.active { box-shadow: 0 4px 16px rgba(0,0,0,.12); transform: translateY(-2px); }
+/* 物件一覧：リスト形式（サムネ左・情報右）。初期20件＋「さらに表示」 */
+.kakiya-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.kakiya-card { display: flex; flex-direction: row; align-items: stretch; border: 1px solid #e3e3df; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; background: #fff; transition: box-shadow .15s, transform .15s; }
+.kakiya-card:hover, .kakiya-card.active { box-shadow: 0 4px 16px rgba(0,0,0,.12); transform: translateY(-1px); }
 .kakiya-card.is-kreva { border-color: #b3541e; }
-.kakiya-card-thumb { height: 130px; background-size: cover; background-position: center; background-color: #eee; }
+.kakiya-card-thumb { width: 220px; height: 150px; flex: 0 0 220px; background-size: cover; background-position: center; background-color: #eee; }
 .kakiya-card-noimg { display: flex; align-items: center; justify-content: center; color: #999; font-size: .8rem; }
-.kakiya-thumb-img { width: 100%; height: 130px; object-fit: cover; display: block; }
+.kakiya-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kakiya-more { display: block; margin: 16px auto 0; padding: 12px 32px; }
+@media (max-width: 600px) {
+  .kakiya-card-thumb { width: 128px; height: 100px; flex-basis: 128px; }
+}
+
+/* ピンのポップアップ（カード風・全体クリックで詳細へ） */
+.kakiya-pop-card { display: block; width: 210px; text-decoration: none; color: inherit; }
+.kakiya-pop-img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: 6px; }
+.kakiya-pop-price { display: block; font-weight: 700; font-size: 1rem; color: #b3541e; }
+.kakiya-pop-title { display: block; font-size: .82rem; line-height: 1.45; margin: 2px 0; }
+.kakiya-pop-meta { display: block; font-size: .74rem; color: #666; }
+.kakiya-pop-link { display: inline-block; margin-top: 4px; color: #1a5f8a; font-weight: 600; font-size: .85rem; }
 .kakiya-photo-ext img { width: 100%; height: auto; border-radius: 10px; }
 .kakiya-photo-ext .kakiya-note { margin: 4px 0 0; }
 /* 写真なし物件の地図サムネ（地理院タイル・物件位置が中心） */
