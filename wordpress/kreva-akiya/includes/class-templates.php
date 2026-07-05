@@ -16,6 +16,11 @@ class KREVA_Akiya_Templates {
 	}
 
 	public function template_include( $template ) {
+		// フロントページはプラグインのHOMEデザインでレンダリング
+		// （無効化したい場合: add_filter( 'kreva_akiya_render_home', '__return_false' );）
+		if ( is_front_page() && apply_filters( 'kreva_akiya_render_home', true ) ) {
+			return KREVA_AKIYA_DIR . 'templates/home.php';
+		}
 		// テーマが用意していればそれを尊重
 		if ( is_post_type_archive( KREVA_Akiya_CPT::POST_TYPE ) || is_tax( array( 'akiya_pref', 'akiya_city', 'akiya_type', 'akiya_status' ) ) ) {
 			$theme = locate_template( array( 'archive-akiya.php' ) );
