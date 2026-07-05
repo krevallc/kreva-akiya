@@ -181,10 +181,15 @@ class KREVA_Akiya_REST {
 				'lng'         => $m['lng'],
 				'price'       => $m['price'],
 				'price_label' => kreva_akiya_format_price( $m['price'] ),
+				'land_area'   => $m['land_area'],
 				'city'        => $this->first_term_name( $post->ID, 'akiya_city' ),
 				'type'        => $this->first_term_name( $post->ID, 'akiya_type' ),
 				'is_kreva'    => $m['is_kreva'],
 				'kuiki_kubun' => $m['kuiki_kubun'],
+				'hazard_any'  => ( ! empty( $m['hazard_flood'] ) || ! empty( $m['hazard_landslide'] )
+									|| ! empty( $m['hazard_tsunami'] ) || ! empty( $m['hazard_hightide'] ) ),
+				'date'        => get_the_date( 'Y-m-d', $post ),
+				'is_new'      => ( time() - get_post_time( 'U', true, $post ) ) < 14 * DAY_IN_SECONDS,
 				'thumb'       => get_the_post_thumbnail_url( $post->ID, 'medium' ) ?: ( $m['image_url'] ?: null ),
 				'source_name' => $m['source_name'],
 			);

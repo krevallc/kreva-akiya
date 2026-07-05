@@ -108,6 +108,25 @@ def type_from_title(title: str) -> str:
     return "戸建"
 
 
+def make_title(city: str | None, address: str | None, price: int | None, layout: str | None) -> str:
+    """可読なタイトルに正規化: 「総社市美袋の空き家（450万円・13DK）」。
+    元タイトル（駅名や物件詳細番号入りで冗長）は使わない。"""
+    town = ""
+    if address and city:
+        rest = address.split(city, 1)[-1]
+        m = re.match(r"([^0-9０-９]+)", rest)  # 番地の手前まで＝町名
+        town = m.group(1).strip() if m else ""
+    place = f"{city or '岡山県'}{town}"
+    parts = []
+    if price:
+        parts.append(f"{int(price / 10000):,}万円" if price >= 10000 else f"{price}円")
+    else:
+        parts.append("価格応談")
+    if layout and len(layout) <= 10:
+        parts.append(layout)
+    return f"{place}の空き家（{'・'.join(parts)}）"
+
+
 # ---- 一覧 → p_no 収集 ---------------------------------------------------
 
 def list_ids(session: PoliteSession, city_code: str, kind: str = "buy", max_pages: int = 20) -> list[str]:
@@ -246,7 +265,7 @@ def parse_detail(session: PoliteSession, p_no: str, kind: str = "buy") -> AkiyaR
     meta = {k: v for k, v in meta.items() if v is not None}
 
     return AkiyaRecord(
-        title=title or f"{city or '岡山県'}の空き家（{p_no}）",
+        title=make_title(city, address, price, layout),
         content="",
         taxonomies={
             "pref": "岡山県",

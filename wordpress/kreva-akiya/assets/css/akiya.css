@@ -63,6 +63,13 @@
 .kakiya-mapthumb-credit { position: absolute; right: 4px; bottom: 2px; font-size: 9px; color: #666;
   background: rgba(255,255,255,.7); padding: 0 4px; border-radius: 3px; }
 .kakiya-card-body { padding: 10px 12px; }
+.kakiya-card-tags { margin-bottom: 2px; }
+.kakiya-tag2 { display: inline-block; font-size: .68rem; font-weight: 600; padding: 1px 7px; border-radius: 4px; margin: 0 4px 4px 0; }
+.kakiya-tag2.t-new { background: #2e7d32; color: #fff; }
+.kakiya-tag2.t-kreva { background: #b3541e; color: #fff; }
+.kakiya-tag2.t-ask { background: #607d8b; color: #fff; }
+.kakiya-tag2.t-warn { background: #ef6c00; color: #fff; }
+.kakiya-tag2.t-hz { background: #b3382c; color: #fff; }
 .kakiya-tag, .kakiya-pin-badge { display: inline-block; background: #b3541e; color: #fff; font-size: .68rem; padding: 1px 6px; border-radius: 4px; margin-bottom: 4px; }
 .kakiya-card-price { font-weight: 700; font-size: 1.05rem; color: #b3541e; }
 .kakiya-card-title { font-size: .9rem; margin: 2px 0; line-height: 1.4; }

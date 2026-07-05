@@ -55,7 +55,17 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 					<input type="number" id="f-price-max" data-filter="price_max_man" placeholder="上限" min="0" />
 				</div>
 			</div>
+			<div class="kakiya-field">
+				<label for="f-sort">並び替え</label>
+				<select id="f-sort">
+					<option value="new">新着順</option>
+					<option value="price_asc">価格が安い順</option>
+					<option value="price_desc">価格が高い順</option>
+					<option value="land_desc">土地が広い順</option>
+				</select>
+			</div>
 			<div class="kakiya-field kakiya-checks">
+				<label><input type="checkbox" id="f-newonly" /> 新着のみ（30日以内）</label>
 				<label><input type="checkbox" data-filter="kuiki" value="exclude_chosei" /> 市街化調整区域を除外</label>
 				<label><input type="checkbox" data-filter="hazard_free" value="1" /> 災害該当を除外</label>
 				<label><input type="checkbox" data-filter="shin_taishin" value="1" /> 新耐震のみ（1982年〜）</label>

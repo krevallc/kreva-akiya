@@ -6,7 +6,36 @@
 	if (!window.L || !document.getElementById('kakiya-map')) return;
 
 	var PAGE_SIZE = 20; // リスト初期表示件数（「さらに表示」で20件ずつ追加）
-	var map, markersLayer, byId = {}, allItems = [], shownCount = 0;
+	var map, markersLayer, byId = {}, rawItems = [], allItems = [], shownCount = 0;
+
+	// 並び替え・新着絞り込み（クライアント側）
+	function applyView() {
+		var items = rawItems.slice();
+		var newOnly = document.getElementById('f-newonly');
+		if (newOnly && newOnly.checked) {
+			var limit = Date.now() - 30 * 86400000;
+			items = items.filter(function (it) { return it.date && Date.parse(it.date) >= limit; });
+		}
+		var sortSel = document.getElementById('f-sort');
+		var mode = sortSel ? sortSel.value : 'new';
+		items.sort(function (a, b) {
+			if (mode === 'price_asc' || mode === 'price_desc') {
+				var pa = (a.price == null) ? null : a.price, pb = (b.price == null) ? null : b.price;
+				if (pa == null && pb == null) return 0;
+				if (pa == null) return 1;  // 価格応談は末尾
+				if (pb == null) return -1;
+				return mode === 'price_asc' ? pa - pb : pb - pa;
+			}
+			if (mode === 'land_desc') {
+				return (b.land_area || 0) - (a.land_area || 0);
+			}
+			// new: 取り込み日の新しい順（同日はKREVA物件優先）
+			var d = String(b.date || '').localeCompare(String(a.date || ''));
+			return d !== 0 ? d : (b.is_kreva ? 1 : 0) - (a.is_kreva ? 1 : 0);
+		});
+		setCount(items.length);
+		render(items);
+	}
 
 	function baseLayers() {
 		var out = {};
@@ -63,7 +92,7 @@
 		setStatus('検索中…');
 		fetch(url, { headers: { 'Accept': 'application/json' } })
 			.then(function (r) { return r.json(); })
-			.then(function (data) { render(data.items || []); setCount(data.count || 0); })
+			.then(function (data) { rawItems = data.items || []; applyView(); })
 			.catch(function () { setStatus('取得に失敗しました'); });
 	}
 
@@ -162,15 +191,21 @@
 		a.className = 'kakiya-card' + (it.is_kreva ? ' is-kreva' : '');
 		a.href = it.permalink;
 		a.id = 'card-' + it.id;
+		// 状態バッジ（NEW / 価格応談 / 調整区域 / 災害区域）
+		var tags = '';
+		if (it.is_new) tags += '<span class="kakiya-tag2 t-new">NEW</span>';
+		if (it.is_kreva) tags += '<span class="kakiya-tag2 t-kreva">KREVA</span>';
+		if (it.price == null) tags += '<span class="kakiya-tag2 t-ask">価格応談</span>';
+		if (it.kuiki_kubun && it.kuiki_kubun.indexOf('調整') >= 0) tags += '<span class="kakiya-tag2 t-warn">市街化調整区域</span>';
+		if (it.hazard_any) tags += '<span class="kakiya-tag2 t-hz">災害想定区域</span>';
 		a.innerHTML =
 			(it.thumb ? '<div class="kakiya-card-thumb"><img class="kakiya-thumb-img" loading="lazy" referrerpolicy="no-referrer" alt="" src="' + esc(it.thumb) + '"></div>'
 				: mapThumbHtml(it.lat, it.lng)) +
 			'<div class="kakiya-card-body">' +
-			(it.is_kreva ? '<span class="kakiya-tag">KREVA</span>' : '') +
+			(tags ? '<div class="kakiya-card-tags">' + tags + '</div>' : '') +
 			'<div class="kakiya-card-price">' + esc(it.price_label || '') + '</div>' +
 			'<div class="kakiya-card-title">' + esc(it.title) + '</div>' +
-			'<div class="kakiya-card-meta">' + esc([it.city, it.type].filter(Boolean).join(' / ')) +
-			(it.kuiki_kubun ? ' ・' + esc(it.kuiki_kubun) : '') + '</div>' +
+			'<div class="kakiya-card-meta">' + esc([it.city, it.type].filter(Boolean).join(' / ')) + '</div>' +
 			'</div>';
 		a.addEventListener('mouseenter', function () { var mk = byId[it.id]; if (mk) mk.openPopup(); });
 		// 外部画像が読めない場合は地図サムネへ自動フォールバック
@@ -201,7 +236,11 @@
 		initMap();
 		var btn = document.getElementById('kakiya-apply');
 		if (btn) btn.addEventListener('click', fetchItems);
-		// 県を選ぶと市の選択肢を（簡易に）フィルタ：ここでは全件取得後の初期表示のみ
+		// 並び替え・新着のみ はクライアント側で即時反映（再取得しない）
+		var sortSel = document.getElementById('f-sort');
+		if (sortSel) sortSel.addEventListener('change', applyView);
+		var newOnly = document.getElementById('f-newonly');
+		if (newOnly) newOnly.addEventListener('change', applyView);
 		fetchItems();
 	});
 })();
