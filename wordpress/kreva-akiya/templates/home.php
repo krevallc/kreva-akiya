@@ -98,11 +98,16 @@ kreva_akiya_header();
 					<span class="kakiya-mapthumb-credit">地図: 地理院タイル</span>
 				</a>
 			<?php else : ?>
-				<div class="kh-brand" aria-hidden="true">
-					<span class="kh-brand-k">K</span>
-					<span class="kh-brand-t">KREVA LLC</span>
-					<span class="kh-brand-s">REAL ESTATE ／ MTKN ／ WEB &amp; SYSTEM</span>
-				</div>
+				<?php
+				// 写真プレースホルダ。実写真が用意でき次第、下記フィルタで画像URLを渡すと差し替わる:
+				// add_filter( 'kreva_home_hero_image', fn() => 'https://.../photo.jpg' );
+				$hero_img = apply_filters( 'kreva_home_hero_image', '' );
+				?>
+				<?php if ( $hero_img ) : ?>
+					<div class="kh-heroph"><img src="<?php echo esc_url( $hero_img ); ?>" alt=""></div>
+				<?php else : ?>
+					<div class="kh-heroph kh-heroph-empty" aria-hidden="true"><span>PHOTO — 写真準備中</span></div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 	</section>

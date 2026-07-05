@@ -14,6 +14,25 @@ class KREVA_Akiya_Templates {
 	public function hooks() {
 		add_filter( 'template_include', array( $this, 'template_include' ) );
 		add_action( 'admin_init', array( $this, 'register_home_setting' ) );
+		add_filter( 'wp_robots', array( $this, 'noindex_until_launch' ) );
+	}
+
+	/**
+	 * 空き家検索の正式公開（設定→一般のチェック）まで、/akiya/ 配下を noindex にする。
+	 * 公開スイッチをONにすると自動で解除される。
+	 */
+	public function noindex_until_launch( $robots ) {
+		if ( get_option( 'kreva_akiya_home_live', 0 ) ) {
+			return $robots; // 公開後はインデックス許可
+		}
+		$is_akiya = is_singular( KREVA_Akiya_CPT::POST_TYPE )
+			|| is_post_type_archive( KREVA_Akiya_CPT::POST_TYPE )
+			|| is_tax( array( 'akiya_pref', 'akiya_city', 'akiya_type', 'akiya_status' ) );
+		if ( $is_akiya ) {
+			$robots['noindex'] = true;
+			$robots['follow']  = true;
+		}
+		return $robots;
 	}
 
 	/**
