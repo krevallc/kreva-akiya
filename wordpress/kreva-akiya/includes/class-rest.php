@@ -107,6 +107,44 @@ class KREVA_Akiya_REST {
 			);
 		}
 
+		// 新耐震のみ（1982年以降の築年）
+		if ( '1' === (string) $req->get_param( 'shin_taishin' ) ) {
+			$meta_query[] = array(
+				'key'     => kreva_akiya_meta_key( 'build_year' ),
+				'value'   => 1982,
+				'type'    => 'NUMERIC',
+				'compare' => '>=',
+			);
+		}
+
+		// 写真ありのみ
+		if ( '1' === (string) $req->get_param( 'has_photo' ) ) {
+			$meta_query[] = array(
+				'key'     => kreva_akiya_meta_key( 'image_url' ),
+				'value'   => '',
+				'compare' => '!=',
+			);
+		}
+
+		// 価格掲載のみ（「価格応談」を除外）
+		if ( '1' === (string) $req->get_param( 'price_only' ) ) {
+			$meta_query[] = array(
+				'key'     => kreva_akiya_meta_key( 'price' ),
+				'value'   => '',
+				'compare' => '!=',
+			);
+		}
+
+		// 成約済は既定で除外（include_sold=1 で含める）
+		if ( '1' !== (string) $req->get_param( 'include_sold' ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'akiya_status',
+				'field'    => 'name',
+				'terms'    => array( '成約済' ),
+				'operator' => 'NOT IN',
+			);
+		}
+
 		$args = array(
 			'post_type'      => KREVA_Akiya_CPT::POST_TYPE,
 			'post_status'    => 'publish',
@@ -200,6 +238,10 @@ class KREVA_Akiya_REST {
 			'post_content' => isset( $body['content'] ) ? wp_kses_post( $body['content'] ) : '',
 			'post_status'  => isset( $body['status'] ) ? sanitize_key( $body['status'] ) : 'publish',
 		);
+		// ユニークな英数スラッグ（例: soja-1855332）。旧スラッグはWPが自動リダイレクト
+		if ( ! empty( $body['slug'] ) ) {
+			$postarr['post_name'] = sanitize_title( $body['slug'] );
+		}
 		if ( $existing ) {
 			$postarr['ID'] = $existing;
 			$post_id       = wp_update_post( $postarr, true );

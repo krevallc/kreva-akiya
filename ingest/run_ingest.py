@@ -52,6 +52,37 @@ def stamp_last_checked(records: list[AkiyaRecord], date_str: str) -> None:
         rec.meta.setdefault("last_checked", date_str)
 
 
+# 市町村名→ローマ字（URLスラッグ用）。政令区は「岡山市」に丸められている前提
+CITY_ROMAJI = {
+    "岡山市": "okayama", "倉敷市": "kurashiki", "総社市": "soja", "井原市": "ibara",
+    "高梁市": "takahashi", "津山市": "tsuyama", "玉野市": "tamano", "笠岡市": "kasaoka",
+    "新見市": "niimi", "備前市": "bizen", "瀬戸内市": "setouchi", "赤磐市": "akaiwa",
+    "真庭市": "maniwa", "美作市": "mimasaka", "浅口市": "asakuchi",
+    "和気町": "wake", "早島町": "hayashima", "里庄町": "satosho", "矢掛町": "yakage",
+    "新庄村": "shinjo", "鏡野町": "kagamino", "勝央町": "shoo", "奈義町": "nagi",
+    "西粟倉村": "nishiawakura", "久米南町": "kumenan", "美咲町": "misaki",
+    "吉備中央町": "kibichuo",
+}
+
+
+def make_slug(rec: AkiyaRecord) -> str:
+    """`<市町村ローマ字>-<ソースID>` 形式のユニークスラッグ（例: soja-1855332, ibara-b0296）。"""
+    import re as _re
+    city = rec.taxonomies.get("city", "")
+    m = _re.match(r"(?:.+郡)?(.+?[市町村])$", city)
+    base = CITY_ROMAJI.get(m.group(1) if m else city, "okayama-pref")
+    sid = str(rec.meta.get("source_id", "")).lower()
+    sid = _re.sub(r"[^a-z0-9]+", "-", sid).strip("-")
+    sid = _re.sub(r"^0+", "", sid) or sid  # 先頭ゼロを除去（000001855332→1855332）
+    return f"{base}-{sid}" if sid else ""
+
+
+def apply_slugs(records: list[AkiyaRecord]) -> None:
+    for rec in records:
+        if not rec.slug:
+            rec.slug = make_slug(rec)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="KREVA 空き家 取り込み")
     ap.add_argument("--source", default="ok_smile", choices=["ok_smile", "ibaragurashi", "takahashi", "all"], help="取り込み元")
@@ -94,6 +125,7 @@ def main() -> int:
         import datetime
         date_str = datetime.date.today().isoformat()
     stamp_last_checked(records, date_str)
+    apply_slugs(records)
 
     # エンリッチ
     if args.enrich:
@@ -103,7 +135,7 @@ def main() -> int:
     # 出力 or 投入
     OUT_DIR.mkdir(exist_ok=True)
     dump = [
-        {"title": r.title, "taxonomies": r.taxonomies, "content": r.content, "meta": r.meta}
+        {"title": r.title, "slug": r.slug, "taxonomies": r.taxonomies, "content": r.content, "meta": r.meta}
         for r in records
     ]
     out_json = OUT_DIR / f"ingest_{args.source}_{args.cities}.json"

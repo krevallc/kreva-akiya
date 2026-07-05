@@ -17,11 +17,6 @@ $cities = get_terms( array( 'taxonomy' => 'akiya_city', 'hide_empty' => false ) 
 $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) );
 ?>
 <div class="kakiya-page">
-	<header class="kakiya-hero">
-		<h1>岡山県の空き家検索</h1>
-		<p>岡山県内の空き家バンク等の物件を、<strong>市街化調整区域・災害ハザード・地価</strong>など最新の周辺情報つきで表示します。</p>
-	</header>
-
 	<div class="kakiya-mapwrap">
 		<div id="kakiya-map" role="application" aria-label="物件地図"></div>
 		<aside class="kakiya-filters kakiya-filters-overlay" aria-label="絞り込み">
@@ -63,11 +58,19 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 			<div class="kakiya-field kakiya-checks">
 				<label><input type="checkbox" data-filter="kuiki" value="exclude_chosei" /> 市街化調整区域を除外</label>
 				<label><input type="checkbox" data-filter="hazard_free" value="1" /> 災害該当を除外</label>
+				<label><input type="checkbox" data-filter="shin_taishin" value="1" /> 新耐震のみ（1982年〜）</label>
+				<label><input type="checkbox" data-filter="has_photo" value="1" /> 写真ありのみ</label>
+				<label><input type="checkbox" data-filter="price_only" value="1" /> 価格掲載のみ</label>
 			</div>
 			<button type="button" id="kakiya-apply" class="kakiya-btn">この条件で検索</button>
 			<p class="kakiya-count"><span id="kakiya-count">-</span> 件</p>
 		</aside>
 	</div>
+
+	<header class="kakiya-hero kakiya-hero-below">
+		<h1>岡山県の空き家検索</h1>
+		<p>岡山県内の空き家バンク等の物件を、<strong>市街化調整区域・災害ハザード・地価</strong>など最新の周辺情報つきで表示します。</p>
+	</header>
 
 	<div id="kakiya-cards" class="kakiya-cards" aria-live="polite"></div>
 
@@ -89,7 +92,7 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 	<footer class="kakiya-cta">
 		<h2>岡山で空き家をお探し・売却したい方へ</h2>
 		<p>KRÈVA LLC は岡山・周辺で空き家を購入し、リノベーション・民泊・再販を行っています。物件のご相談・売却のご相談はお気軽に。</p>
-		<a class="kakiya-btn kakiya-btn-primary" href="mailto:info@kreva.co.jp">KREVAに相談する</a>
+		<a class="kakiya-btn kakiya-btn-primary" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">KREVAに相談する</a>
 	</footer>
 
 	<p class="kakiya-disclaimer">

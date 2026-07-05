@@ -8,6 +8,7 @@ robots.txt は全許可（Disallow 空）。空き家バンク特集の一覧か
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -206,11 +207,20 @@ def parse_detail(session: PoliteSession, p_no: str, kind: str = "buy") -> AkiyaR
 
     # 物件写真（subcenter.jp 配信）。タイトル中の表示用物件番号に一致する写真を優先
     image_url = None
+    image_urls: list[str] = []
     photos = re.findall(r"https://[a-z0-9.]+\.subcenter\.jp/[^\"']+\.jpe?g", r.text)
     if photos:
         m_disp = re.search(r"物件詳細\((\d+)\)", title)
         own = [p for p in photos if m_disp and m_disp.group(1) in p]
-        image_url = (own or photos)[0]
+        pool = own or photos
+        seen_ph: set[str] = set()
+        for ph in pool:
+            if ph not in seen_ph:
+                seen_ph.add(ph)
+                image_urls.append(ph)
+            if len(image_urls) >= 8:
+                break
+        image_url = image_urls[0]
 
     city = city_from_address(address or "")
     ptype = type_from_title(title)
@@ -228,6 +238,7 @@ def parse_detail(session: PoliteSession, p_no: str, kind: str = "buy") -> AkiyaR
         "kenpei": kenpei, "yoseki": yoseki,
         "kuiki_kubun": kuiki,
         "image_url": image_url,
+        "image_urls": json.dumps(image_urls, ensure_ascii=False) if image_urls else None,
         "source_name": SOURCE_NAME,
         "source_url": url,
         "source_id": p_no,

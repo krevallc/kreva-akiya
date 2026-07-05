@@ -27,15 +27,19 @@ class AkiyaRecord:
     content: str = ""
     status: str = "publish"
     taxonomies: dict = field(default_factory=dict)  # {pref, city, type, status}
+    slug: str = ""  # ユニークな英数スラッグ（例: soja-1855332）。空ならWP側で自動生成
 
     def to_body(self) -> dict:
-        return {
+        body = {
             "title": self.title,
             "content": self.content,
             "status": self.status,
             "taxonomies": self.taxonomies,
             "meta": self.meta,
         }
+        if self.slug:
+            body["slug"] = self.slug
+        return body
 
 
 class WPClient:

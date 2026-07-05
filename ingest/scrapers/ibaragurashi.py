@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import re
 import sys
 from pathlib import Path
@@ -101,11 +102,16 @@ def parse_detail(session: PoliteSession, url: str) -> AkiyaRecord | None:
         print(f"[ibaragurashi] 座標取得できずスキップ: {url}")
         return None
 
-    # 物件写真（/upload/ 配下）
+    # 物件写真（/upload/ 配下・最大8枚）
     image_url = None
-    m_img = re.search(r"https://ibaragurashi\.jp/upload/[^\"']+\.(?:jpe?g|png|webp)", r.text)
-    if m_img:
-        image_url = m_img.group(0)
+    image_urls: list[str] = []
+    for ph in re.findall(r"https://ibaragurashi\.jp/upload/[^\"']+\.(?:jpe?g|png|webp)", r.text):
+        if ph not in image_urls:
+            image_urls.append(ph)
+        if len(image_urls) >= 8:
+            break
+    if image_urls:
+        image_url = image_urls[0]
 
     # 設備・補修等を説明文に（購入者価値が高い定性情報）
     desc_keys = ["物件の設備", "補修", "付帯施設", "空き家になった時", "その他"]
@@ -121,6 +127,7 @@ def parse_detail(session: PoliteSession, url: str) -> AkiyaRecord | None:
         "structure": structure,
         "build_year": build_year,
         "image_url": image_url,
+        "image_urls": json.dumps(image_urls, ensure_ascii=False) if image_urls else None,
         "source_name": SOURCE_NAME,
         "source_url": url,
         "source_id": reg_no or url.rsplit("/", 1)[-1],

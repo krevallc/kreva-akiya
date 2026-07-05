@@ -37,17 +37,37 @@ while ( have_posts() ) :
 		<p class="kakiya-address"><?php echo esc_html( $m['address'] ?: '' ); ?></p>
 		<p class="kakiya-price-lg"><?php echo esc_html( kreva_akiya_format_price( $m['price'] ) ); ?></p>
 
+		<?php
+		// 画像ギャラリー（詳細情報の上）。image_urls(JSON) → 無ければ image_url 単発
+		$gallery = array();
+		if ( ! empty( $m['image_urls'] ) ) {
+			$decoded = json_decode( $m['image_urls'], true );
+			if ( is_array( $decoded ) ) {
+				$gallery = array_values( array_filter( array_map( 'esc_url_raw', $decoded ) ) );
+			}
+		}
+		if ( ! $gallery && ! empty( $m['image_url'] ) ) {
+			$gallery = array( $m['image_url'] );
+		}
+		?>
+		<?php if ( $gallery ) : ?>
+			<div class="kakiya-gallery">
+				<?php foreach ( $gallery as $gi => $gurl ) : ?>
+					<a class="kakiya-gallery-item<?php echo 0 === $gi ? ' is-main' : ''; ?>"
+						href="<?php echo esc_url( $gurl ); ?>" target="_blank" rel="noopener nofollow">
+						<img src="<?php echo esc_url( $gurl ); ?>" alt="<?php the_title_attribute(); ?> 写真<?php echo (int) $gi + 1; ?>"
+							loading="lazy" referrerpolicy="no-referrer"
+							onerror="this.closest('.kakiya-gallery-item').style.display='none'">
+					</a>
+				<?php endforeach; ?>
+			</div>
+			<p class="kakiya-note kakiya-gallery-note">画像出典：<?php echo esc_html( $m['source_name'] ?: '掲載元' ); ?>（元ページより直接表示・クリックで拡大）</p>
+		<?php endif; ?>
+
 		<div class="kakiya-single-grid">
 			<div class="kakiya-single-left">
 				<?php if ( has_post_thumbnail() ) : ?>
 					<div class="kakiya-photo"><?php the_post_thumbnail( 'large' ); ?></div>
-				<?php elseif ( ! empty( $m['image_url'] ) ) : ?>
-					<div class="kakiya-photo kakiya-photo-ext">
-						<img src="<?php echo esc_url( $m['image_url'] ); ?>" alt="<?php the_title_attribute(); ?>"
-							referrerpolicy="no-referrer" loading="lazy"
-							onerror="this.closest('.kakiya-photo').style.display='none'">
-						<p class="kakiya-note">画像出典：<?php echo esc_html( $m['source_name'] ?: '掲載元' ); ?>（元ページより直接表示）</p>
-					</div>
 				<?php endif; ?>
 
 				<section>
@@ -164,7 +184,7 @@ while ( have_posts() ) :
 				<div class="kakiya-cta-box">
 					<h3>この物件についてKREVAに相談</h3>
 					<p>購入・見学・活用（リノベ/民泊）のご相談を承ります。</p>
-					<a class="kakiya-btn kakiya-btn-primary" href="mailto:info@kreva.co.jp?subject=<?php echo rawurlencode( '空き家の相談：' . get_the_title() ); ?>">メールで相談する</a>
+					<a class="kakiya-btn kakiya-btn-primary" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">お問い合わせフォームで相談する</a>
 				</div>
 
 				<?php if ( $m['source_name'] || $m['source_url'] ) : ?>

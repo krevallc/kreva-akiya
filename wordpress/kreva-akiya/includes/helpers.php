@@ -51,6 +51,7 @@ function kreva_akiya_meta_schema() {
 		'future_pop'          => array( 'type' => 'string', 'label' => '将来推計人口(参考)' ),
 		// 画像（元サイトの写真URL・直リンク表示用）
 		'image_url'      => array( 'type' => 'string', 'label' => '物件画像URL(外部)' ),
+		'image_urls'     => array( 'type' => 'string', 'label' => '物件画像URL一覧(JSON配列)' ),
 		// 出所
 		'source_name'    => array( 'type' => 'string', 'label' => '出典名' ),
 		'source_url'     => array( 'type' => 'string', 'label' => '元ページURL' ),
