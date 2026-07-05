@@ -237,7 +237,7 @@
 .kh-heromap:hover .kh-heromap-label { border-color: var(--accent); color: var(--accent); }
 /* 非公開時のヒーロー右側：写真（プレースホルダ→実写真に差し替え可） */
 .kh-heroph { aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; }
-.kh-heroph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kh-heroph img { width: 100%; height: 100%; object-fit: cover; object-position: center 32%; display: block; }
 .kh-heroph-empty { display: flex; align-items: center; justify-content: center;
 	background: repeating-linear-gradient(45deg, #eae6df 0 14px, #e0dbd2 14px 28px);
 	color: #a49d92; font-size: 11px; letter-spacing: .08em; font-family: ui-monospace, Menlo, monospace; }
@@ -268,8 +268,11 @@
 .kh-h2-w { color: #fff; margin-bottom: 16px; }
 .kh-kicker-l { color: #e0a37f; }
 .kh-mgrid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; }
-.kh-mph { aspect-ratio: 16 / 10; border-radius: 20px;
-	background: repeating-linear-gradient(45deg, #3a352f 0 14px, #2f2b26 14px 28px); }
+.kh-mph { display: block; aspect-ratio: 16 / 10; border-radius: 20px; overflow: hidden;
+	background: repeating-linear-gradient(45deg, #3a352f 0 14px, #2f2b26 14px 28px);
+	transition: box-shadow .18s, transform .18s; }
+.kh-mph img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.kh-mph:hover { box-shadow: 0 10px 28px rgba(0,0,0,.4); transform: translateY(-2px); }
 .kh-mchips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 .kh-mc { font-size: 11.5px; font-weight: 700; border: 1px solid rgba(255,255,255,.25); border-radius: 999px;
 	padding: 6px 12px; color: #c9c2b8; }

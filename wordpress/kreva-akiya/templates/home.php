@@ -99,15 +99,11 @@ kreva_akiya_header();
 				</a>
 			<?php else : ?>
 				<?php
-				// 写真プレースホルダ。実写真が用意でき次第、下記フィルタで画像URLを渡すと差し替わる:
+				// ヒーロー写真（Denim Days・アムステルダムのMTKNブース）。差し替えは下記フィルタで:
 				// add_filter( 'kreva_home_hero_image', fn() => 'https://.../photo.jpg' );
-				$hero_img = apply_filters( 'kreva_home_hero_image', '' );
+				$hero_img = apply_filters( 'kreva_home_hero_image', 'https://kreva.co.jp/wp-content/uploads/2026/07/denim-days-mtkn.jpg' );
 				?>
-				<?php if ( $hero_img ) : ?>
-					<div class="kh-heroph"><img src="<?php echo esc_url( $hero_img ); ?>" alt=""></div>
-				<?php else : ?>
-					<div class="kh-heroph kh-heroph-empty" aria-hidden="true"><span>PHOTO — 写真準備中</span></div>
-				<?php endif; ?>
+				<div class="kh-heroph"><img src="<?php echo esc_url( $hero_img ); ?>" alt="Denim Days Amsterdam — MTKNブース"></div>
 			<?php endif; ?>
 		</div>
 	</section>
@@ -196,7 +192,10 @@ kreva_akiya_header();
 
 	<section class="kh-sec kh-mtkn" id="kh-mtkn">
 		<div class="kh-wrap kh-mgrid">
-			<div class="kh-mph" aria-hidden="true"></div>
+			<?php $mtkn_img = apply_filters( 'kreva_home_mtkn_image', 'https://kreva.co.jp/wp-content/uploads/2026/07/mtkn-top-capture.jpg' ); ?>
+			<a class="kh-mph" href="https://mtkn.nl" target="_blank" rel="noopener" aria-label="mtkn.nl を見る">
+				<img src="<?php echo esc_url( $mtkn_img ); ?>" alt="mtkn.nl — Japanese Selvedge Denim & Vintage" loading="lazy">
+			</a>
 			<div>
 				<div class="kh-kicker kh-kicker-l">MTKN — AMSTERDAM</div>
 				<h2 class="kh-h2 kh-h2-w">日本のデニムを、欧州へ。</h2>
