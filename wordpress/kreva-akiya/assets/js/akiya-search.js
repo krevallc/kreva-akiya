@@ -94,6 +94,28 @@
 			'<a href="' + esc(it.permalink) + '">詳細を見る →</a></div>';
 	}
 
+	// 写真が無い物件用：物件位置を中心にした地理院タイルの地図サムネを生成
+	function mapThumbHtml(lat, lng) {
+		var z = 15, n = Math.pow(2, z);
+		var px = (lng + 180) / 360 * n * 256;
+		var latRad = lat * Math.PI / 180;
+		var py = (1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2 * n * 256;
+		var half = 170, halfH = 65; // 想定最大カード幅340px・高さ130pxぶんのタイルを敷く
+		var tiles = '';
+		var x0 = Math.floor((px - half) / 256), x1 = Math.floor((px + half) / 256);
+		var y0 = Math.floor((py - halfH) / 256), y1 = Math.floor((py + halfH) / 256);
+		for (var tx = x0; tx <= x1; tx++) {
+			for (var ty = y0; ty <= y1; ty++) {
+				tiles += '<img src="https://cyberjapandata.gsi.go.jp/xyz/pale/' + z + '/' + tx + '/' + ty + '.png" ' +
+					'style="position:absolute;left:' + (tx * 256 - px) + 'px;top:' + (ty * 256 - py) + 'px;width:256px;height:256px;max-width:none" alt="" loading="lazy">';
+			}
+		}
+		return '<div class="kakiya-card-thumb kakiya-card-mapthumb">' +
+			'<div class="kakiya-mapthumb-inner">' + tiles + '</div>' +
+			'<span class="kakiya-mapthumb-pin"></span>' +
+			'<span class="kakiya-mapthumb-credit">地図: 地理院タイル</span></div>';
+	}
+
 	function cardEl(it) {
 		var a = document.createElement('a');
 		a.className = 'kakiya-card' + (it.is_kreva ? ' is-kreva' : '');
@@ -101,7 +123,7 @@
 		a.id = 'card-' + it.id;
 		a.innerHTML =
 			(it.thumb ? '<div class="kakiya-card-thumb" style="background-image:url(' + esc(it.thumb) + ')"></div>'
-				: '<div class="kakiya-card-thumb kakiya-card-noimg">画像なし</div>') +
+				: mapThumbHtml(it.lat, it.lng)) +
 			'<div class="kakiya-card-body">' +
 			(it.is_kreva ? '<span class="kakiya-tag">KREVA</span>' : '') +
 			'<div class="kakiya-card-price">' + esc(it.price_label || '') + '</div>' +

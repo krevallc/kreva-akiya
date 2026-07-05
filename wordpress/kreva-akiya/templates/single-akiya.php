@@ -166,7 +166,7 @@ while ( have_posts() ) :
 						<p>
 							出典：<?php echo esc_html( $m['source_name'] ?: '—' ); ?><br>
 							<?php if ( $m['source_url'] ) : ?>
-								<a href="<?php echo esc_url( $m['source_url'] ); ?>" target="_blank" rel="noopener nofollow">元の掲載ページを見る ↗</a><br>
+								<a href="<?php echo esc_url( $m['source_url'] ); ?>" target="_blank" rel="noopener nofollow"><strong>物件の写真・最新情報を元ページで見る ↗</strong></a><br>
 							<?php endif; ?>
 							<?php echo $m['last_checked'] ? '最終確認日：' . esc_html( $m['last_checked'] ) : ''; ?>
 						</p>

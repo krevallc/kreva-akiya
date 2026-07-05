@@ -76,7 +76,14 @@
       "Bash(git init *)",
       "Bash(git add *)",
       "Bash(git commit -q -m 'KREVA 空き家検索 初期コミット *)",
-      "Bash(grep -E \"\\\\.env$|out/\")"
+      "Bash(grep -E \"\\\\.env$|out/\")",
+      "Bash(git branch *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(curl -sS --max-time 15 \"https://kreva.co.jp/wp-json/kreva-akiya/v1/search?per_page=500\" -o /tmp/s3.json)",
+      "Bash(python3 -c \"import json;print\\('本番件数:',json.load\\(open\\('/tmp/s3.json'\\)\\)['count']\\)\")",
+      "mcp__claude-in-chrome__find",
+      "mcp__claude-in-chrome__javascript_tool"
     ]
   }
 }

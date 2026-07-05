@@ -29,6 +29,14 @@
 .kakiya-card.is-kreva { border-color: #b3541e; }
 .kakiya-card-thumb { height: 130px; background-size: cover; background-position: center; background-color: #eee; }
 .kakiya-card-noimg { display: flex; align-items: center; justify-content: center; color: #999; font-size: .8rem; }
+/* 写真なし物件の地図サムネ（地理院タイル・物件位置が中心） */
+.kakiya-card-mapthumb { position: relative; overflow: hidden; }
+.kakiya-mapthumb-inner { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.kakiya-mapthumb-pin { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -14px 0 0 -7px;
+  background: #b3541e; border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.kakiya-mapthumb-credit { position: absolute; right: 4px; bottom: 2px; font-size: 9px; color: #666;
+  background: rgba(255,255,255,.7); padding: 0 4px; border-radius: 3px; }
 .kakiya-card-body { padding: 10px 12px; }
 .kakiya-tag, .kakiya-pin-badge { display: inline-block; background: #b3541e; color: #fff; font-size: .68rem; padding: 1px 6px; border-radius: 4px; margin-bottom: 4px; }
 .kakiya-card-price { font-weight: 700; font-size: 1.05rem; color: #b3541e; }
