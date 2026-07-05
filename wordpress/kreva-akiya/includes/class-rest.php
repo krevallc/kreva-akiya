@@ -191,6 +191,7 @@ class KREVA_Akiya_REST {
 				'date'        => get_the_date( 'Y-m-d', $post ),
 				'is_new'      => ( time() - get_post_time( 'U', true, $post ) ) < 14 * DAY_IN_SECONDS,
 				'thumb'       => get_the_post_thumbnail_url( $post->ID, 'medium' ) ?: ( $m['image_url'] ?: null ),
+				'thumb2'      => $this->second_image( $m ),
 				'source_name' => $m['source_name'],
 			);
 		}
@@ -292,6 +293,15 @@ class KREVA_Akiya_REST {
 			),
 			$existing ? 200 : 201
 		);
+	}
+
+	/** image_urls(JSON) の2枚目を返す（カードのホバー切替用） */
+	private function second_image( $m ) {
+		if ( empty( $m['image_urls'] ) ) {
+			return null;
+		}
+		$arr = json_decode( $m['image_urls'], true );
+		return ( is_array( $arr ) && ! empty( $arr[1] ) ) ? $arr[1] : null;
 	}
 
 	private function first_term_name( $post_id, $tax ) {

@@ -1,101 +1,138 @@
-/* KREVA 空き家検索 スタイル。テーマに干渉しないよう .kakiya- で名前空間化。 */
-.kakiya-page { max-width: 1200px; margin: 0 auto; padding: 16px; }
-.kakiya-hero h1 { font-size: 1.8rem; margin: 0 0 .4em; }
-.kakiya-hero p { color: #444; line-height: 1.7; }
+/* KREVA 空き家検索 v0.5 — Claude Design トークン準拠
+   Color: accent #b3541e / ink #211d19 / sub #6f6a63 / line #e7e3dc / bg #faf9f6
+   Badge: NEW #1f8a5b / 応談 #5a5650 / 調整 #d07f1f / 災害 #c2413a
+   Radius: pill 999 / card 16 / popup 14 / バッジ 6。Breakpoint 820px */
 
-/* 地図：サイト幅いっぱい（フルブリード）＋絞り込みパネルをオーバーレイ */
-.kakiya-mapwrap { position: relative; width: 100vw; margin-left: calc(50% - 50vw); margin-top: 16px; }
-.kakiya-mapwrap #kakiya-map { width: 100%; height: 78vh; min-height: 560px; border-radius: 0; border: 0; }
-.kakiya-filters-overlay { position: absolute; top: 16px; left: 16px; z-index: 1100;
-  width: 272px; max-height: calc(100% - 32px); overflow-y: auto;
-  background: rgba(255,255,255,.96); box-shadow: 0 2px 14px rgba(0,0,0,.25); }
-@media (max-width: 700px) {
-  .kakiya-filters-overlay { position: static; width: auto; max-height: none;
-    margin: 0 16px 10px; background: #f7f7f5; box-shadow: none; }
-  .kakiya-mapwrap #kakiya-map { height: 60vh; min-height: 380px; }
+.kakiya-page2, .kakiya-single {
+	--accent: #b3541e; --ink: #211d19; --sub: #6f6a63; --line: #e7e3dc; --bg: #faf9f6;
+	font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+	color: var(--ink);
+	-webkit-font-smoothing: antialiased;
 }
 
-.kakiya-filters { background: #f7f7f5; border: 1px solid #e5e5e0; border-radius: 10px; padding: 16px; align-self: start; }
-.kakiya-field { margin-bottom: 14px; }
-.kakiya-field > label { display: block; font-weight: 600; font-size: .8rem; margin-bottom: 4px; color: #333; }
-.kakiya-field select, .kakiya-field input[type=number] { width: 100%; padding: 7px 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-.kakiya-row { display: flex; align-items: center; gap: 6px; }
-.kakiya-row input { flex: 1; }
-.kakiya-checks label { display: block; font-weight: 400; font-size: .85rem; margin: 6px 0; cursor: pointer; }
+/* ---------- フィルタピルバー ---------- */
+.kakiya-fbar { position: sticky; top: 0; z-index: 45; width: 100vw; margin-left: calc(50% - 50vw);
+	background: #fff; border-bottom: 1px solid var(--line); padding: 12px 24px;
+	display: flex; gap: 8px; align-items: center; overflow-x: auto; box-sizing: border-box; }
+.kakiya-pill { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 999px;
+	padding: 9px 16px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer;
+	color: var(--ink); font-family: inherit; line-height: 1.3; }
+.kakiya-pill:hover { border-color: #c4beb3; }
+.kakiya-pill.on { background: #f7e9e0; border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.kakiya-pill-select { appearance: none; -webkit-appearance: none; padding-right: 32px;
+	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6a63' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+	background-repeat: no-repeat; background-position: right 14px center; }
+.kakiya-vr { width: 1px; height: 22px; background: var(--line); flex: none; }
 
-.kakiya-btn { display: inline-block; background: #2b2b2b; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-size: .95rem; cursor: pointer; text-decoration: none; text-align: center; }
-.kakiya-btn:hover { opacity: .9; }
-.kakiya-btn-primary { background: #b3541e; }
-#kakiya-apply { width: 100%; }
-.kakiya-count { text-align: center; margin: 12px 0 0; font-weight: 600; color: #b3541e; }
+/* ---------- スプリットビュー ---------- */
+.kakiya-split { display: flex; align-items: flex-start; width: 100vw; margin-left: calc(50% - 50vw); }
+.kakiya-splitmap { width: 55%; flex: none; position: sticky; top: 58px; height: calc(100vh - 58px); }
+.kakiya-splitmap #kakiya-map { width: 100%; height: 100%; }
+.kakiya-mchip { position: absolute; z-index: 1001; top: 12px; left: 50%; transform: translateX(-50%);
+	background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px;
+	font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.1); font-family: inherit; }
+.kakiya-mchip:hover { border-color: var(--accent); color: var(--accent); }
 
-.kakiya-main { min-width: 0; }
-#kakiya-map { height: 460px; border-radius: 10px; border: 1px solid #ddd; }
+.kakiya-results { flex: 1; min-width: 0; padding: 20px 24px 48px; background: var(--bg); }
+.kakiya-rhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.kakiya-rtitle { font-size: 17px; font-weight: 900; }
+.kakiya-rsub { font-size: 12px; color: var(--sub); margin-top: 2px; }
 
-/* 物件一覧：リスト形式（サムネ左・情報右）。初期20件＋「さらに表示」 */
-.kakiya-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-.kakiya-card { display: flex; flex-direction: row; align-items: stretch; border: 1px solid #e3e3df; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; background: #fff; transition: box-shadow .15s, transform .15s; }
-.kakiya-card:hover, .kakiya-card.active { box-shadow: 0 4px 16px rgba(0,0,0,.12); transform: translateY(-1px); }
-.kakiya-card.is-kreva { border-color: #b3541e; }
-.kakiya-card-thumb { width: 220px; height: 150px; flex: 0 0 220px; background-size: cover; background-position: center; background-color: #eee; }
-.kakiya-card-noimg { display: flex; align-items: center; justify-content: center; color: #999; font-size: .8rem; }
-.kakiya-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.kakiya-more { display: block; margin: 16px auto 0; padding: 12px 32px; }
-@media (max-width: 600px) {
-  .kakiya-card-thumb { width: 128px; height: 100px; flex-basis: 128px; }
-}
+/* ---------- カードグリッド ---------- */
+.kakiya-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 1100px) { .kakiya-cards { grid-template-columns: 1fr; } }
+.kakiya-card2 { display: block; background: #fff; border: 1px solid var(--line); border-radius: 16px;
+	overflow: hidden; cursor: pointer; text-decoration: none; color: inherit;
+	transition: box-shadow .18s, transform .18s; }
+.kakiya-card2:hover { box-shadow: 0 10px 28px rgba(28,24,18,.12); transform: translateY(-2px); }
+.kakiya-ph { aspect-ratio: 4 / 3; position: relative; background: #edeae4; overflow: hidden; }
+.kakiya-ph1, .kakiya-ph2 { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.kakiya-ph2 { opacity: 0; transition: opacity .25s; z-index: 1; }
+.kakiya-card2:hover .kakiya-ph2 { opacity: 1; }
+.kakiya-bdg { position: absolute; z-index: 2; top: 10px; left: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.kakiya-b { font-size: 11px; font-weight: 700; color: #fff; padding: 4px 8px; border-radius: 6px; letter-spacing: .02em; }
+.b-new { background: #1f8a5b; } .b-ask { background: #5a5650; }
+.b-adj { background: #d07f1f; } .b-haz { background: #c2413a; } .b-kv { background: var(--accent); }
+.kakiya-cb { padding: 14px 16px 16px; }
+.kakiya-price2 { font-size: 22px; font-weight: 900; }
+.kakiya-ttl2 { font-size: 13.5px; font-weight: 500; margin-top: 4px; line-height: 1.45; }
+.kakiya-meta2 { font-size: 12px; color: var(--sub); margin-top: 6px; }
+.kakiya-empty { color: var(--sub); padding: 24px 4px; grid-column: 1 / -1; }
+.kakiya-more2 { display: block; margin: 32px auto 0; padding: 13px 44px; border-radius: 999px;
+	border: 1.5px solid var(--ink); background: #fff; font-weight: 700; font-size: 14px;
+	cursor: pointer; font-family: inherit; color: var(--ink); }
+.kakiya-more2:hover { background: var(--ink); color: #fff; }
 
-/* ピンのポップアップ（カード風・全体クリックで詳細へ） */
-.kakiya-pop-card { display: block; width: 210px; text-decoration: none; color: inherit; }
-.kakiya-pop-img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: 6px; }
-.kakiya-pop-price { display: block; font-weight: 700; font-size: 1rem; color: #b3541e; }
-.kakiya-pop-title { display: block; font-size: .82rem; line-height: 1.45; margin: 2px 0; }
-.kakiya-pop-meta { display: block; font-size: .74rem; color: #666; }
-.kakiya-pop-link { display: inline-block; margin-top: 4px; color: #1a5f8a; font-weight: 600; font-size: .85rem; }
-.kakiya-photo-ext img { width: 100%; height: auto; border-radius: 10px; }
-.kakiya-photo-ext .kakiya-note { margin: 4px 0 0; }
-/* 写真なし物件の地図サムネ（地理院タイル・物件位置が中心） */
-.kakiya-card-mapthumb { position: relative; overflow: hidden; }
+/* 地図サムネ（写真なし物件） */
 .kakiya-mapthumb-inner { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
 .kakiya-mapthumb-pin { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -14px 0 0 -7px;
-  background: #b3541e; border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-  box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+	background: var(--accent); border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+	box-shadow: 0 1px 4px rgba(0,0,0,.4); z-index: 1; }
 .kakiya-mapthumb-credit { position: absolute; right: 4px; bottom: 2px; font-size: 9px; color: #666;
-  background: rgba(255,255,255,.7); padding: 0 4px; border-radius: 3px; }
-.kakiya-card-body { padding: 10px 12px; }
-.kakiya-card-tags { margin-bottom: 2px; }
-.kakiya-tag2 { display: inline-block; font-size: .68rem; font-weight: 600; padding: 1px 7px; border-radius: 4px; margin: 0 4px 4px 0; }
-.kakiya-tag2.t-new { background: #2e7d32; color: #fff; }
-.kakiya-tag2.t-kreva { background: #b3541e; color: #fff; }
-.kakiya-tag2.t-ask { background: #607d8b; color: #fff; }
-.kakiya-tag2.t-warn { background: #ef6c00; color: #fff; }
-.kakiya-tag2.t-hz { background: #b3382c; color: #fff; }
-.kakiya-tag, .kakiya-pin-badge { display: inline-block; background: #b3541e; color: #fff; font-size: .68rem; padding: 1px 6px; border-radius: 4px; margin-bottom: 4px; }
-.kakiya-card-price { font-weight: 700; font-size: 1.05rem; color: #b3541e; }
-.kakiya-card-title { font-size: .9rem; margin: 2px 0; line-height: 1.4; }
-.kakiya-card-meta { font-size: .78rem; color: #666; }
-.kakiya-empty { color: #666; padding: 20px; }
+	background: rgba(255,255,255,.7); padding: 0 4px; border-radius: 3px; z-index: 1; }
 
-.kakiya-cta { margin: 36px 0 12px; padding: 24px; background: #faf5f0; border: 1px solid #ecdccd; border-radius: 12px; text-align: center; }
-.kakiya-cta h2 { margin: 0 0 .4em; }
-.kakiya-cta p { color: #555; margin: 0 0 16px; }
+/* ---------- 地図ピン・ポップアップ ---------- */
+.kakiya-pin-wrap { background: none; border: none; }
+.kakiya-pin { position: absolute; transform: translate(-50%, -100%); display: inline-block;
+	background: #fff; border: 1px solid #d6d1c8; border-radius: 999px; padding: 5px 11px;
+	font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.12);
+	cursor: pointer; transition: transform .12s, background .12s; font-family: 'Noto Sans JP', sans-serif; }
+.kakiya-pin:hover { transform: translate(-50%, -100%) scale(1.08); }
+.kakiya-pin.kv { border-color: var(--accent, #b3541e); color: #b3541e; }
+.kakiya-pin.hot { background: #211d19; color: #fff; border-color: #211d19; z-index: 5; }
+.kakiya-popup .leaflet-popup-content-wrapper { border-radius: 14px; padding: 0; overflow: hidden;
+	box-shadow: 0 12px 32px rgba(0,0,0,.22); }
+.kakiya-popup .leaflet-popup-content { margin: 0; width: 236px !important; line-height: 1.5; }
+.kakiya-pop-card { display: block; text-decoration: none; color: #211d19; font-family: 'Noto Sans JP', sans-serif; }
+.kakiya-pop-img { width: 100%; height: 110px; object-fit: cover; display: block; }
+.kakiya-pop-price { display: block; font-weight: 900; font-size: 16px; padding: 12px 14px 0; }
+.kakiya-pop-title { display: block; font-size: 12px; line-height: 1.5; padding: 3px 14px 0; color: #3c3831; }
+.kakiya-pop-link { display: inline-block; margin: 8px 14px 14px; font-size: 12px; font-weight: 700; color: #b3541e; }
 
-.kakiya-external { margin: 28px 0 8px; padding: 18px 20px; background: #f4f7f9; border: 1px solid #dde6ea; border-radius: 12px; }
-.kakiya-external h2 { margin: 0 0 .3em; font-size: 1.15rem; }
-.kakiya-external > p { color: #555; margin: 0 0 12px; font-size: .9rem; }
-.kakiya-external-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.kakiya-external-list li { background: #fff; border: 1px solid #e3e3df; border-radius: 8px; padding: 10px 12px; }
-.kakiya-external-list a { color: #1a5f8a; font-weight: 600; text-decoration: none; display: block; }
-.kakiya-external-list a:hover { text-decoration: underline; }
-.kakiya-external-list .kakiya-note { display: block; margin-top: 2px; }
+/* ---------- モバイル切替 ---------- */
+.kakiya-mtab { position: fixed; z-index: 60; bottom: 20px; left: 50%; transform: translateX(-50%);
+	display: none; align-items: center; gap: 8px; background: var(--ink, #211d19); color: #fff; border: none;
+	border-radius: 999px; padding: 13px 24px; font-weight: 700; font-size: 14px; cursor: pointer;
+	box-shadow: 0 8px 24px rgba(0,0,0,.3); font-family: inherit; }
+@media (max-width: 820px) {
+	.kakiya-fbar { padding: 10px 16px; }
+	.kakiya-splitmap { display: none; position: fixed; top: 58px; left: 0; right: 0; bottom: 0;
+		width: 100%; height: auto; z-index: 30; }
+	.kakiya-split.vmap .kakiya-splitmap { display: block; }
+	.kakiya-split.vmap .kakiya-results { display: none; }
+	.kakiya-mtab { display: flex; }
+	.kakiya-results { padding: 16px 16px 96px; }
+}
 
-.kakiya-disclaimer { font-size: .78rem; color: #777; line-height: 1.7; border-top: 1px solid #eee; padding-top: 12px; }
+/* ---------- SEOセクション・CTA ---------- */
+.kakiya-seo { width: 100vw; margin-left: calc(50% - 50vw); padding: 56px 24px 40px;
+	border-top: 1px solid var(--line); background: #fff; box-sizing: border-box; }
+.kakiya-wrapn { max-width: 860px; margin: 0 auto; }
+.kakiya-h2 { font-size: 22px; font-weight: 900; margin: 0 0 14px; }
+.kakiya-h3 { font-size: 16px; font-weight: 700; margin: 28px 0 12px; }
+.kakiya-p { font-size: 14px; line-height: 1.9; color: #4c4841; margin: 0 0 12px; }
+.kakiya-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.kakiya-lnk { border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 13px;
+	color: var(--ink); text-decoration: none; background: #fff; }
+.kakiya-lnk:hover { border-color: var(--accent); color: var(--accent); }
+.kakiya-ctab { background: #f8ece3; border: 1px solid #ecd4c2; border-radius: 20px; padding: 32px 36px;
+	display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin: 44px auto 0; }
+.kakiya-ctah { font-size: 19px; font-weight: 900; margin: 0 0 6px; }
+.kakiya-ctap { font-size: 13px; color: #4c4841; margin: 0; line-height: 1.8; }
+.kakiya-cta2 { background: var(--accent); color: #fff; border: none; border-radius: 999px;
+	padding: 14px 28px; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+.kakiya-cta2:hover { filter: brightness(.94); color: #fff; }
+.kakiya-note2 { font-size: 11.5px; color: #96908a; line-height: 1.9; margin: 36px 0 0; }
 
-/* 詳細ページ */
+/* ===================== 詳細ページ（既存デザイン維持・トークン適用） ===================== */
 .kakiya-single { max-width: 1100px; margin: 0 auto; padding: 16px; }
-/* 画像ギャラリー（詳細情報の上）：1枚目はカラム幅いっぱい、残りは横並びサムネ帯 */
+.kakiya-badge { display: inline-block; background: var(--accent); color: #fff; font-size: .8rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
+.kakiya-title { font-size: 1.6rem; font-weight: 900; margin: 0 0 .2em; }
+.kakiya-address { color: var(--sub); margin: 0 0 .3em; }
+.kakiya-price-lg { font-size: 1.6rem; font-weight: 900; color: var(--accent); margin: 0 0 16px; }
+/* 画像ギャラリー：1枚目はカラム幅いっぱい、残りは横並びサムネ帯 */
 .kakiya-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; }
-.kakiya-gallery-item { display: block; border-radius: 8px; overflow: hidden; background: #eee; }
+.kakiya-gallery-item { display: block; border-radius: 12px; overflow: hidden; background: #eee; }
 .kakiya-gallery-item.is-main { flex: 1 1 100%; }
 .kakiya-gallery-item.is-main img { width: 100%; height: auto; max-height: 560px; object-fit: cover; display: block; }
 .kakiya-gallery-item:not(.is-main) { height: 120px; }
@@ -103,33 +140,30 @@
 .kakiya-gallery-item:hover img { transform: scale(1.02); }
 .kakiya-gallery-note { margin: 0 0 16px; }
 @media (max-width: 600px) {
-  .kakiya-gallery-item:not(.is-main) { height: 90px; }
-  .kakiya-gallery-item:not(.is-main) img { height: 90px; width: 126px; }
+	.kakiya-gallery-item:not(.is-main) { height: 90px; }
+	.kakiya-gallery-item:not(.is-main) img { height: 90px; width: 126px; }
 }
-
-/* 周辺地図（詳細情報の下・カラム幅） */
-.kakiya-single-left #kakiya-map-single { width: 100%; height: 440px; border-radius: 10px; border: 1px solid #ddd; }
-.kakiya-badge { display: inline-block; background: #b3541e; color: #fff; font-size: .8rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
-.kakiya-title { font-size: 1.6rem; margin: 0 0 .2em; }
-.kakiya-address { color: #666; margin: 0 0 .3em; }
-.kakiya-price-lg { font-size: 1.6rem; font-weight: 700; color: #b3541e; margin: 0 0 16px; }
 .kakiya-single-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
 @media (max-width: 860px) { .kakiya-single-grid { grid-template-columns: 1fr; } }
 .kakiya-single-left section { margin-bottom: 24px; }
-.kakiya-single-left h2 { font-size: 1.1rem; border-left: 4px solid #b3541e; padding-left: 8px; margin: 0 0 10px; }
-.kakiya-photo img { width: 100%; height: auto; border-radius: 10px; margin-bottom: 16px; }
+.kakiya-single-left h2 { font-size: 1.1rem; font-weight: 700; border-left: 4px solid var(--accent); padding-left: 8px; margin: 0 0 10px; }
+.kakiya-single-left #kakiya-map-single { width: 100%; height: 440px; border-radius: 12px; border: 1px solid var(--line); }
+.kakiya-photo img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 16px; }
 .kakiya-spec { width: 100%; border-collapse: collapse; }
 .kakiya-spec th, .kakiya-spec td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; font-size: .92rem; vertical-align: top; }
-.kakiya-spec th { width: 130px; color: #555; font-weight: 600; background: #fafafa; }
-.kakiya-warn { display: inline-block; color: #a33; font-size: .8rem; margin-left: 6px; }
-.kakiya-hazard-hit { color: #a33; }
-.kakiya-hazard-none { color: #2a7; }
-.kakiya-note { font-size: .78rem; color: #888; }
-
+.kakiya-spec th { width: 130px; color: #555; font-weight: 600; background: var(--bg); }
+.kakiya-warn { display: inline-block; color: #c2413a; font-size: .8rem; margin-left: 6px; }
+.kakiya-hazard-hit { color: #c2413a; }
+.kakiya-hazard-none { color: #1f8a5b; }
+.kakiya-note { font-size: .78rem; color: #96908a; }
 .kakiya-single-right > * { margin-bottom: 16px; }
-.kakiya-relard, .kakiya-cta-box, .kakiya-source { background: #f7f7f5; border: 1px solid #e5e5e0; border-radius: 10px; padding: 14px 16px; }
-.kakiya-cta-box { background: #faf5f0; border-color: #ecdccd; }
-.kakiya-cta-box h3, .kakiya-relard h3, .kakiya-source h3 { margin: 0 0 8px; font-size: 1rem; }
+.kakiya-relard, .kakiya-cta-box, .kakiya-source { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.kakiya-cta-box { background: #f8ece3; border-color: #ecd4c2; }
+.kakiya-cta-box h3, .kakiya-relard h3, .kakiya-source h3 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; }
+.kakiya-btn { display: inline-block; background: #2b2b2b; color: #fff; border: 0; border-radius: 999px; padding: 10px 16px; font-size: .95rem; cursor: pointer; text-decoration: none; text-align: center; }
+.kakiya-btn:hover { opacity: .9; }
+.kakiya-btn-primary { background: var(--accent); }
 .kakiya-cta-box .kakiya-btn { width: 100%; box-sizing: border-box; }
 .kakiya-source { font-size: .85rem; color: #555; }
-.kakiya-source a { color: #b3541e; }
+.kakiya-source a { color: var(--accent); }
+.kakiya-body { line-height: 1.9; }

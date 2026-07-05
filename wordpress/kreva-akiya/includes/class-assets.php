@@ -39,7 +39,14 @@ class KREVA_Akiya_Assets {
 		wp_enqueue_style( 'leaflet', $leaflet_css, array(), self::LEAFLET_VER );
 		wp_enqueue_script( 'leaflet', $leaflet_js, array(), self::LEAFLET_VER, true );
 
-		wp_enqueue_style( 'kreva-akiya', KREVA_AKIYA_URL . 'assets/css/akiya.css', array( 'leaflet' ), KREVA_AKIYA_VERSION );
+		// デザイン指定フォント（価格・見出しの weight 900 を使用）
+		wp_enqueue_style(
+			'kreva-akiya-font',
+			'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap',
+			array(),
+			null
+		);
+		wp_enqueue_style( 'kreva-akiya', KREVA_AKIYA_URL . 'assets/css/akiya.css', array( 'leaflet', 'kreva-akiya-font' ), KREVA_AKIYA_VERSION );
 
 		$config = kreva_akiya_map_config();
 		$config['restSearch'] = esc_url_raw( rest_url( KREVA_Akiya_REST::NS . '/search' ) );
