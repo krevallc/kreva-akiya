@@ -173,12 +173,29 @@ function kreva_akiya_hazard_tiles() {
 }
 
 /**
+ * テーマの header/footer テンプレートパートを「wp_head より前に」レンダリングして保持する。
+ * ブロックのレイアウト用CSS（wp-container-* 等）は描画時に収集され wp_head で出力されるため、
+ * 描画を先に済ませないとナビの右寄せ等が崩れる。
+ */
+function kreva_akiya_block_parts() {
+	static $parts = null;
+	if ( null === $parts ) {
+		$parts = array(
+			'header' => do_blocks( '<!-- wp:template-part {"slug":"header","tagName":"header"} /-->' ),
+			'footer' => do_blocks( '<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->' ),
+		);
+	}
+	return $parts;
+}
+
+/**
  * テーマ種別に応じたヘッダー出力。
  * ブロックテーマ（Twenty Twenty-Five等）では get_header() がテーマのヘッダーを
  * 出力しないため、HTML骨格＋テーマの header テンプレートパートを直接描画する。
  */
 function kreva_akiya_header() {
 	if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+		$parts = kreva_akiya_block_parts(); // wp_head 前にレンダリング（レイアウトCSS収集のため）
 		?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -190,7 +207,7 @@ function kreva_akiya_header() {
 <?php
 		wp_body_open();
 		echo '<div class="wp-site-blocks">';
-		block_template_part( 'header' );
+		echo $parts['header']; // phpcs:ignore WordPress.Security.EscapeOutput
 	} else {
 		get_header();
 	}
@@ -201,7 +218,8 @@ function kreva_akiya_header() {
  */
 function kreva_akiya_footer() {
 	if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
-		block_template_part( 'footer' );
+		$parts = kreva_akiya_block_parts();
+		echo $parts['footer']; // phpcs:ignore WordPress.Security.EscapeOutput
 		echo '</div>';
 		wp_footer();
 		echo '</body></html>';

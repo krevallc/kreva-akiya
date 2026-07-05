@@ -22,8 +22,9 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 		<p>岡山県内の空き家バンク等の物件を、<strong>市街化調整区域・災害ハザード・地価</strong>など最新の周辺情報つきで表示します。</p>
 	</header>
 
-	<div class="kakiya-layout">
-		<aside class="kakiya-filters" aria-label="絞り込み">
+	<div class="kakiya-mapwrap">
+		<div id="kakiya-map" role="application" aria-label="物件地図"></div>
+		<aside class="kakiya-filters kakiya-filters-overlay" aria-label="絞り込み">
 			<div class="kakiya-field">
 				<label for="f-pref">都道府県</label>
 				<select id="f-pref" data-filter="pref">
@@ -62,17 +63,13 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 			<div class="kakiya-field kakiya-checks">
 				<label><input type="checkbox" data-filter="kuiki" value="exclude_chosei" /> 市街化調整区域を除外</label>
 				<label><input type="checkbox" data-filter="hazard_free" value="1" /> 災害該当を除外</label>
-				<label><input type="checkbox" data-filter="kreva_only" value="1" /> KREVAの物件のみ</label>
 			</div>
 			<button type="button" id="kakiya-apply" class="kakiya-btn">この条件で検索</button>
 			<p class="kakiya-count"><span id="kakiya-count">-</span> 件</p>
 		</aside>
-
-		<div class="kakiya-main">
-			<div id="kakiya-map" role="application" aria-label="物件地図"></div>
-			<div id="kakiya-cards" class="kakiya-cards" aria-live="polite"></div>
-		</div>
 	</div>
+
+	<div id="kakiya-cards" class="kakiya-cards" aria-live="polite"></div>
 
 	<section class="kakiya-external">
 		<h2>外部の空き家バンクでも探す</h2>
@@ -92,7 +89,7 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 	<footer class="kakiya-cta">
 		<h2>岡山で空き家をお探し・売却したい方へ</h2>
 		<p>KRÈVA LLC は岡山・周辺で空き家を購入し、リノベーション・民泊・再販を行っています。物件のご相談・売却のご相談はお気軽に。</p>
-		<a class="kakiya-btn kakiya-btn-primary" href="mailto:info@kreva.co.jp">KREVAに相談する（info@kreva.co.jp）</a>
+		<a class="kakiya-btn kakiya-btn-primary" href="mailto:info@kreva.co.jp">KREVAに相談する</a>
 	</footer>
 
 	<p class="kakiya-disclaimer">

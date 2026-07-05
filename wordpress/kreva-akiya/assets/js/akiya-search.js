@@ -38,7 +38,7 @@
 	}
 
 	function collectFilters() {
-		var params = {};
+		var params = { per_page: 500 }; // 全件表示（既定200では県全域をカバーできない）
 		document.querySelectorAll('[data-filter]').forEach(function (el) {
 			var key = el.getAttribute('data-filter');
 			if (el.type === 'checkbox') {
@@ -83,7 +83,15 @@
 			bounds.push([it.lat, it.lng]);
 			cards.appendChild(cardEl(it));
 		});
-		if (bounds.length) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+		if (bounds.length) {
+			// 左側の絞り込みオーバーレイに隠れないよう左余白を広めに
+			var wideLayout = window.innerWidth > 700;
+			map.fitBounds(bounds, {
+				paddingTopLeft: [wideLayout ? 310 : 30, 30],
+				paddingBottomRight: [30, 30],
+				maxZoom: 14
+			});
+		}
 	}
 
 	function popupHtml(it) {
