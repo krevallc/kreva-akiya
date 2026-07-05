@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!--
+DESIGN TOKENS（検索一覧ページと共通・実装移植用）
+■ Color  --accent #b3541e / --ink #211d19 / --sub #6f6a63 / --line #e7e3dc / --bg #faf9f6
+ バッジ: NEW #1f8a5b / 価格応談 #5a5650 / 調整区域 #d07f1f / 災害想定 #c2413a / KREVA=accent
+ accent淡色 = color-mix(in oklab, var(--accent) 8–12%, #fff)（CTAバナー・選択pill）
+■ Type  'Noto Sans JP'  11/12/13/14px=メタ・ラベル, 16px=小見出し, 22px=H2, 28px=詳細価格
+ weight 400/500/700/900（価格・見出し900）本文行間1.9
+■ Radius  pill/ボタン999px / カード・セクション16px / バナー20px / バッジ・チップ6px
+■ Shadow  hover 0 10px 28px rgba(28,24,18,.12) / モーダル 0 12px 32px rgba(0,0,0,.22)
+■ Breakpoint  820px
+
+LIGHTBOX 挙動仕様（vanilla JSで移植）
+1. ギャラリーの写真/サムネをクリック → ページ遷移せず全画面オーバーレイを開く（新規タブ禁止）
+2. 背景 rgba(15,12,10,.93) 暗転・body スクロールロック（overflow:hidden）
+3. 拡大画像は object-fit:contain 相当（max 86vw × 70vh、縦横比維持）
+4. 次/前へ: 左右矢印ボタン・キーボード ← → ・ホイール（deltaY±、250msスロットル）・スワイプ（40px閾値）
+5. カウンター「3 / 8」を左上に表示
+6. 閉じる: ✕ボタン・ESCキー・背景（画像外）クリック
+7. 下部に横並びサムネイル（現在位置を白枠ハイライト・クリックでジャンプ・末尾/先頭はループ）
+-->
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#faf9f6;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.hdr{height:64px;padding:0 24px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:50}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff}
+.tag{font-size:11px;color:var(--sub)}
+.nl{color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:500}
+.nl:hover{color:var(--ink)}
+.cta{background:var(--accent);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.cta:hover{filter:brightness(.94)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.bc{font-size:12px;color:var(--sub);padding:16px 0 12px}
+.bcl{color:var(--sub);text-decoration:none}
+.bcl:hover{color:var(--accent)}
+.thead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.h1{font-size:22px;font-weight:900;margin:0 0 6px;line-height:1.4}
+.addr{font-size:13px;color:var(--sub)}
+.b{font-size:11px;font-weight:700;color:#fff;padding:4px 8px;border-radius:6px;letter-spacing:.02em}
+.b-new{background:#1f8a5b}.b-ask{background:#5a5650}.b-adj{background:#d07f1f}.b-haz{background:#c2413a}.b-kv{background:var(--accent)}
+.plabel{font-size:12px;color:var(--sub);text-align:right}
+.pbig{font-size:28px;font-weight:900;line-height:1.2}
+.yen{font-size:15px;font-weight:700;margin-left:2px}
+.gal{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;height:440px;border-radius:16px;overflow:hidden}
+.gsub{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px}
+.gt{position:relative;border:none;padding:0;cursor:pointer;overflow:hidden;background:repeating-linear-gradient(45deg,#eae6df 0 14px,#e0dbd2 14px 28px);display:flex;align-items:center;justify-content:center;color:#a49d92;font-size:11px;letter-spacing:.08em;font-family:ui-monospace,Menlo,monospace}
+.gt:hover{filter:brightness(.96)}
+.gall{position:absolute;z-index:3;bottom:12px;right:12px;background:#fff;border:1.5px solid var(--ink);border-radius:999px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.gall:hover{background:var(--ink);color:#fff}
+.cap{font-size:11.5px;color:#96908a;margin:8px 2px 0}
+.cols{display:flex;gap:24px;align-items:flex-start;margin-top:24px}
+.main{flex:1;min-width:0}
+.aside{width:340px;flex:none;position:sticky;top:84px}
+.sec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px}
+.sh{font-size:16px;font-weight:700;margin:0 0 10px}
+.tr{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px;align-items:center}
+.tr:last-child{border-bottom:none}
+.tl{color:var(--sub)}
+.tv{font-weight:500}
+.chip{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:3px 9px}
+.c-ok{background:#e9f4ee;color:#1f8a5b}
+.c-ng{background:#faeae8;color:#c2413a}
+.c-warn{background:#fdf3e6;color:#b26010}
+.wnote{font-size:12px;color:#b26010;background:#fdf3e6;border:1px solid #f0d9b8;border-radius:10px;padding:10px 14px;line-height:1.8;margin-top:12px}
+.p{font-size:13.5px;line-height:1.9;color:#4c4841;margin:0}
+.map{position:relative;height:440px;border-radius:12px;overflow:hidden;background:#e8e6df;margin-top:6px}
+.mg{position:absolute;background:#dfe6d4;border-radius:30%}
+.mw{position:absolute;background:#cfdfe3;border-radius:40%}
+.mr{position:absolute;background:#fff}
+.mpin{position:absolute;z-index:3;transform:translate(-50%,-100%);background:var(--accent);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.attr{position:absolute;z-index:4;bottom:8px;right:10px;font-size:10px;background:rgba(255,255,255,.85);padding:3px 8px;border-radius:5px;color:#7a746b}
+.lyrs{position:absolute;z-index:4;top:12px;left:12px;display:flex;gap:6px}
+.lyr{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.lyr.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:700}
+.haz{position:absolute;inset:0;z-index:2;pointer-events:none}
+.aval{font-size:20px;font-weight:900}
+.aunit{font-size:12px;font-weight:700}
+.anote{font-size:11.5px;color:#96908a;line-height:1.8;margin-top:10px}
+.actab{background:color-mix(in oklab,var(--accent) 9%,#fff);border:1px solid color-mix(in oklab,var(--accent) 22%,#fff);border-radius:20px;padding:22px;margin-bottom:20px}
+.slink{font-size:12.5px;font-weight:700;color:var(--accent);text-decoration:none}
+.near{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:box-shadow .18s,transform .18s}
+.card:hover{box-shadow:0 10px 28px rgba(28,24,18,.12);transform:translateY(-2px)}
+.ph{aspect-ratio:4/3;position:relative;background:repeating-linear-gradient(45deg,#edeae4 0 14px,#e3dfd7 14px 28px);display:flex;align-items:center;justify-content:center;color:#a49d92;font-size:11px;letter-spacing:.08em}
+.bdg{position:absolute;top:10px;left:10px;display:flex;gap:6px}
+.cb{padding:14px 16px 16px}
+.cprice{font-size:20px;font-weight:900}
+.cttl{font-size:13px;font-weight:500;margin-top:4px;line-height:1.45}
+.cmeta{font-size:12px;color:var(--sub);margin-top:6px}
+.ftr{margin-top:40px;padding:20px 24px;border-top:1px solid var(--line);font-size:12px;color:var(--sub);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;background:#fff}
+.lb{position:fixed;inset:0;z-index:100;background:rgba(15,12,10,.93);display:flex;flex-direction:column}
+.lbtop{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;color:#fff}
+.lbcnt{font-size:13px;letter-spacing:.1em}
+.lbx{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:15px;cursor:pointer}
+.lbx:hover{background:rgba(255,255,255,.28)}
+.lbmain{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:0}
+.lbimg{background:repeating-linear-gradient(45deg,#3a352f 0 16px,#2f2b26 16px 32px);border-radius:8px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;color:#b8b0a4;font-size:12px;letter-spacing:.08em;max-height:70vh}
+.lbar{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:17px;cursor:pointer;z-index:2}
+.lbar:hover{background:rgba(255,255,255,.28)}
+.lft{left:20px}.rgt{right:20px}
+.lbth{display:flex;gap:8px;justify-content:center;padding:14px 20px 18px;overflow-x:auto}
+.lbt{width:66px;height:48px;border-radius:8px;flex:none;border:2px solid rgba(255,255,255,.15);cursor:pointer;background:repeating-linear-gradient(45deg,#4a443c 0 10px,#3d3831 10px 20px);color:#b8b0a4;font-size:9px;display:flex;align-items:center;justify-content:center;padding:0;opacity:.65}
+.lbt.on{border-color:#fff;opacity:1}
+@media(max-width:820px){
+.navr{display:none}
+.hdr{padding:0 16px}
+.wrap{padding:0 16px}
+.gal{grid-template-columns:1fr;height:270px}
+.gsub{display:none}
+.cols{flex-direction:column}
+.aside{width:100%;position:static}
+.thead{align-items:flex-start;flex-direction:column;gap:8px}
+.plabel{text-align:left}
+.tr{grid-template-columns:112px 1fr}
+.near{grid-template-columns:1fr}
+.map{height:320px}
+.lbar{width:38px;height:38px}
+.lft{left:8px}.rgt{right:8px}
+}
+</style>
+</helmet>
+<div class="page">
+<header class="hdr fx ac jb"><div class="fx ac gap10"><div class="logo fx ac jc fw8 fs16">K</div><div><div class="fw8 fs15" style="letter-spacing:.08em">KREVA</div><div class="tag">岡山の空き家検索</div></div></div><nav class="navr fx ac gap24"><a class="nl" href="Akiya Search.dc.html">空き家を探す</a><a class="nl" href="#">移住サポート</a><a class="nl" href="#">売却のご相談</a><a class="nl" href="#">会社概要</a></nav><button class="cta">無料相談</button></header>
+<div class="wrap">
+<nav class="bc"><a class="bcl" href="Akiya Search.dc.html">空き家検索</a> › <a class="bcl" href="#">高梁市</a> › <span>高梁市成羽町下原の空き家（No.720）</span></nav>
+<div class="thead"><div><h1 class="h1">高梁市成羽町下原の空き家（No.720）</h1><div class="fx ac gap10 wrap"><span class="addr">岡山県高梁市成羽町下原</span><span class="fx gap6"><span class="b b-new">NEW</span><span class="b b-adj">調整区域</span><span class="b b-haz">災害想定</span></span></div></div><div><div class="plabel">価格</div><div class="pbig">350<span class="yen">万円</span></div></div></div>
+<div class="gal">
+<button class="gt" onClick="{{ open0 }}">物件写真 01｜外観</button>
+<div class="gsub"><sc-for list="{{ tiles }}" as="g" hint-placeholder-count="4"><button class="gt" onClick="{{ g.open }}">物件写真 {{ g.n }}｜{{ g.label }}</button></sc-for></div>
+<button class="gall" onClick="{{ open0 }}">すべての写真（8）</button>
+</div>
+<p class="cap">画像出典：高梁市空き家バンク（元ページより）</p>
+<div class="cols">
+<main class="main">
+<section class="sec"><h2 class="sh">物件概要</h2>
+<div class="tr"><span class="tl">価格</span><span class="tv fw7">350万円</span></div>
+<div class="tr"><span class="tl">所在地</span><span class="tv">岡山県高梁市成羽町下原</span></div>
+<div class="tr"><span class="tl">土地面積</span><span class="tv">520㎡（157.3坪）</span></div>
+<div class="tr"><span class="tl">建物面積</span><span class="tv">185㎡（延床・55.9坪）</span></div>
+<div class="tr"><span class="tl">間取り</span><span class="tv">7DK</span></div>
+<div class="tr"><span class="tl">構造</span><span class="tv">木造2階建・瓦葺</span></div>
+<div class="tr"><span class="tl">築年</span><span class="tv">1980年（築46年・推定）</span></div>
+<div class="tr"><span class="tl">耐震（推定）</span><span class="tv">旧耐震基準 <span class="chip c-warn">1981年5月以前の建築</span></span></div>
+</section>
+<section class="sec"><h2 class="sh">用途・規制</h2>
+<div class="tr"><span class="tl">区域区分</span><span class="tv">市街化調整区域 <span class="chip c-warn">要注意</span></span></div>
+<div class="tr"><span class="tl">用途地域</span><span class="tv">指定なし</span></div>
+<div class="tr"><span class="tl">建蔽率／容積率</span><span class="tv">60％／200％</span></div>
+<div class="wnote">この物件は市街化調整区域内にあります。建て替え・増改築・用途変更に許可が必要となる場合があります。ご検討の際は事前に高梁市の担当窓口または当社までご相談ください。</div>
+</section>
+<section class="sec"><h2 class="sh">災害リスク</h2>
+<div class="tr"><span class="tl">洪水浸水想定</span><span class="tv"><span class="chip c-ok">該当なし</span></span></div>
+<div class="tr"><span class="tl">土砂災害警戒区域</span><span class="tv"><span class="chip c-ng">該当（イエローゾーン）</span></span></div>
+<div class="tr"><span class="tl">津波・高潮</span><span class="tv"><span class="chip c-ok">該当なし</span></span></div>
+<div class="tr"><span class="tl">液状化傾向</span><span class="tv">低い（山地・丘陵）</span></div>
+</section>
+<section class="sec"><h2 class="sh">生活・周辺</h2>
+<div class="tr"><span class="tl">学区</span><span class="tv">成羽小学校区・成羽中学校区</span></div>
+<div class="tr"><span class="tl">最寄り医療機関</span><span class="tv">成羽病院（約1.2km）</span></div>
+<div class="tr"><span class="tl">保育園</span><span class="tv">成羽保育園（約0.9km）</span></div>
+<div class="tr"><span class="tl">避難場所</span><span class="tv">成羽文化センター（約1.1km）</span></div>
+<div class="tr"><span class="tl">将来人口（2050年推計）</span><span class="tv">現在比 −38％（500mメッシュ）</span></div>
+</section>
+<section class="sec"><h2 class="sh">説明</h2>
+<p class="p">上水道：あり／下水道：浄化槽（個別処理）／電気：中国電力／ガス：プロパン。家財が一部残置されています（引渡し時の取扱いは応相談）。屋根・外壁は概ね良好ですが、浴室・台所の水回りに修繕が必要です。庭に納屋（約20㎡）付き。前面道路は幅員約4mの市道に接道。現地見学は高梁市空き家バンクを通じてお申し込みください。</p>
+</section>
+<section class="sec"><h2 class="sh">周辺地図</h2>
+<div class="map">
+<div class="mg" style="left:8%;top:8%;width:26%;height:24%"></div><div class="mg" style="left:64%;top:52%;width:28%;height:30%"></div><div class="mw" style="left:-8%;bottom:-24%;width:50%;height:44%"></div>
+<div class="mr" style="left:-5%;top:52%;width:112%;height:5px;transform:rotate(-5deg)"></div><div class="mr" style="left:56%;top:-5%;width:4px;height:114%;transform:rotate(7deg)"></div>
+<sc-if value="{{ hazOn }}" hint-placeholder-val="{{ false }}"><div class="haz" style="background:{{ hazBg }}"></div></sc-if>
+<div class="lyrs"><sc-for list="{{ layers }}" as="l" hint-placeholder-count="3"><button class="lyr {{ l.cls }}" onClick="{{ l.tap }}">{{ l.label }}</button></sc-for></div>
+<div class="mpin">この物件</div>
+<div class="attr mono">MAP PLACEHOLDER｜Leaflet ＋ 国土地理院タイル・ハザードレイヤ</div>
+</div>
+</section>
+</main>
+<aside class="aside">
+<div class="sec" style="padding:22px"><h2 class="sh">相場の目安</h2>
+<div class="tr"><span class="tl">最寄り地価（住宅地）</span><span class="aval">2.1<span class="aunit">万円/㎡</span></span></div>
+<div class="tr"><span class="tl">固定資産税（概算）</span><span class="aval">約1.8<span class="aunit">万円/年</span></span></div>
+<p class="anote">最寄りの地価公示・都道府県地価調査地点および評価額からの概算です。実際の税額・評価額は高梁市の課税明細でご確認ください。</p>
+</div>
+<div class="actab"><h2 class="sh" style="margin-bottom:6px">この物件について相談する</h2><p class="p" style="font-size:12.5px;margin-bottom:14px">現地確認の代行・調整区域の手続き・リフォーム見積りなど、岡山の空き家に詳しいスタッフが無料でご相談を承ります。</p><button class="cta w100" style="padding:13px;font-size:14px">お問い合わせフォームへ</button></div>
+<div class="sec" style="padding:22px"><h2 class="sh" style="font-size:14px">出典・最終確認</h2><p class="anote" style="margin-top:0">出典：高梁市空き家バンク（No.720）<br>最終確認日：2026年6月28日<br>掲載情報は取得時点のものです。</p><a class="slink" href="#">元ページを見る ↗</a></div>
+</aside>
+</div>
+<section style="margin-top:16px"><h2 class="h1" style="font-size:18px">近くの物件</h2>
+<div class="near"><sc-for list="{{ nearby }}" as="it" hint-placeholder-count="3"><article class="card"><div class="ph"><span class="mono">物件写真 {{ it.photo }}</span><div class="bdg"><sc-for list="{{ it.badges }}" as="b" hint-placeholder-count="1"><span class="b {{ b.c }}">{{ b.t }}</span></sc-for></div></div><div class="cb"><div class="cprice">{{ it.big }}<span class="yen" style="font-size:12px">{{ it.unit }}</span></div><div class="cttl">{{ it.title }}</div><div class="cmeta">{{ it.meta }}</div></div></article></sc-for></div>
+</section>
+</div>
+<footer class="ftr"><span>© 2026 KREVA LLC</span><span>岡山県の空き家検索｜kreva.co.jp/akiya/</span></footer>
+<sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+<div class="lb" onWheel="{{ lbWheel }}" onTouchStart="{{ lbTs }}" onTouchEnd="{{ lbTe }}">
+<div class="lbtop"><span class="lbcnt mono">{{ lbCount }}</span><button class="lbx" onClick="{{ lbClose }}">✕</button></div>
+<div class="lbmain" onClick="{{ lbBack }}"><button class="lbar lft" onClick="{{ lbPrev }}">←</button><div class="lbimg mono" style="aspect-ratio:{{ lbAr }};width:{{ lbW }}"><span>物件写真 {{ lbN }}｜{{ lbLabel }}</span><span style="font-size:10px;opacity:.7">縦横比バラバラ → contain 表示</span></div><button class="lbar rgt" onClick="{{ lbNext }}">→</button></div>
+<div class="lbth"><sc-for list="{{ lbThumbs }}" as="t" hint-placeholder-count="8"><button class="lbt {{ t.cls }}" onClick="{{ t.jump }}">{{ t.n }}</button></sc-for></div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#b3541e&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#b3541e&quot;,&quot;#2f6f6a&quot;,&quot;#33568f&quot;],&quot;section&quot;:&quot;ブランド&quot;}}">
+class Component extends DCLogic {
+  state = { lbOpen: false, lbIdx: 0, layer: 0 };
+  PHOTOS = [
+    { n: '01', label: '外観', w: 4, h: 3 },
+    { n: '02', label: '玄関', w: 3, h: 4 },
+    { n: '03', label: '居間', w: 3, h: 2 },
+    { n: '04', label: '台所', w: 4, h: 3 },
+    { n: '05', label: '浴室', w: 3, h: 4 },
+    { n: '06', label: '和室', w: 3, h: 2 },
+    { n: '07', label: '庭', w: 16, h: 9 },
+    { n: '08', label: '納屋', w: 4, h: 3 }
+  ];
+  componentDidMount() {
+    this._key = (e) => {
+      if (!this.state.lbOpen) return;
+      if (e.key === 'ArrowRight') this.step(1);
+      else if (e.key === 'ArrowLeft') this.step(-1);
+      else if (e.key === 'Escape') this.setState({ lbOpen: false });
+    };
+    document.addEventListener('keydown', this._key);
+    this.applyAccent();
+  }
+  componentWillUnmount() { document.removeEventListener('keydown', this._key); document.body.style.overflow = ''; }
+  componentDidUpdate() {
+    document.body.style.overflow = this.state.lbOpen ? 'hidden' : '';
+    this.applyAccent();
+  }
+  applyAccent() { document.body.style.setProperty('--accent', this.props.accent ?? '#b3541e'); }
+  step(d) { this.setState(s => ({ lbIdx: (s.lbIdx + d + this.PHOTOS.length) % this.PHOTOS.length })); }
+  openAt(i) { this.setState({ lbOpen: true, lbIdx: i }); }
+  renderVals() {
+    const { lbOpen, lbIdx, layer } = this.state;
+    const P = this.PHOTOS;
+    const cur = P[lbIdx];
+    const layers = ['標準', '洪水浸水', '土砂災害'].map((label, i) => ({
+      label, cls: layer === i ? 'on' : '', tap: () => this.setState({ layer: i })
+    }));
+    const nearby = [
+      { photo: '05', big: '260', unit: '万円', title: '高梁市川上町の空き家（260万円・6DK）', meta: '高梁市・一戸建て｜土地440㎡・築1976年', badges: [{ t: 'NEW', c: 'b-new' }] },
+      { photo: '01', big: '450', unit: '万円', title: '総社市美袋の空き家（450万円・13DK）', meta: '総社市・一戸建て｜土地495㎡・築1975年', badges: [{ t: 'KREVA', c: 'b-kv' }] },
+      { photo: '11', big: '230', unit: '万円', title: '新見市哲多町の空き家（230万円・6K）', meta: '新見市・一戸建て｜土地350㎡・築1969年', badges: [] }
+    ];
+    return {
+      tiles: P.slice(1, 5).map((g, i) => ({ ...g, open: () => this.openAt(i + 1) })),
+      open0: () => this.openAt(0),
+      layers,
+      hazOn: layer > 0,
+      hazBg: layer === 1 ? 'rgba(75,140,190,.28)' : 'rgba(210,150,60,.3)',
+      nearby,
+      lbOpen,
+      lbCount: (lbIdx + 1) + ' / ' + P.length,
+      lbN: cur.n, lbLabel: cur.label,
+      lbAr: cur.w + ' / ' + cur.h,
+      lbW: 'min(86vw, calc(70vh * ' + (cur.w / cur.h).toFixed(3) + '))',
+      lbThumbs: P.map((t, i) => ({ n: t.n, cls: i === lbIdx ? 'on' : '', jump: () => this.setState({ lbIdx: i }) })),
+      lbClose: () => this.setState({ lbOpen: false }),
+      lbBack: (e) => { if (e.target === e.currentTarget) this.setState({ lbOpen: false }); },
+      lbNext: () => this.step(1),
+      lbPrev: () => this.step(-1),
+      lbWheel: (e) => {
+        const now = Date.now();
+        if (this._wt && now - this._wt < 250) return;
+        if (Math.abs(e.deltaY) < 8) return;
+        this._wt = now;
+        this.step(e.deltaY > 0 ? 1 : -1);
+      },
+      lbTs: (e) => { this._tx = e.touches[0].clientX; },
+      lbTe: (e) => {
+        const dx = e.changedTouches[0].clientX - (this._tx ?? 0);
+        if (Math.abs(dx) > 40) this.step(dx < 0 ? 1 : -1);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

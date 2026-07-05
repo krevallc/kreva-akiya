@@ -55,6 +55,7 @@ class KREVA_Akiya_Assets {
 			wp_enqueue_script( 'kreva-akiya-single', KREVA_AKIYA_URL . 'assets/js/akiya-single.js', array( 'leaflet' ), KREVA_AKIYA_VERSION, true );
 			$post_id = get_queried_object_id();
 			$config['property'] = kreva_akiya_get_meta( $post_id );
+			$config['postId']   = $post_id;
 			wp_localize_script( 'kreva-akiya-single', 'KREVA_AKIYA', $config );
 		} else {
 			wp_enqueue_script( 'kreva-akiya-search', KREVA_AKIYA_URL . 'assets/js/akiya-search.js', array( 'leaflet' ), KREVA_AKIYA_VERSION, true );
