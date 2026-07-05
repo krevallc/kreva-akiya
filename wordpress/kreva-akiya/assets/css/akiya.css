@@ -29,6 +29,9 @@
 .kakiya-card.is-kreva { border-color: #b3541e; }
 .kakiya-card-thumb { height: 130px; background-size: cover; background-position: center; background-color: #eee; }
 .kakiya-card-noimg { display: flex; align-items: center; justify-content: center; color: #999; font-size: .8rem; }
+.kakiya-thumb-img { width: 100%; height: 130px; object-fit: cover; display: block; }
+.kakiya-photo-ext img { width: 100%; height: auto; border-radius: 10px; }
+.kakiya-photo-ext .kakiya-note { margin: 4px 0 0; }
 /* 写真なし物件の地図サムネ（地理院タイル・物件位置が中心） */
 .kakiya-card-mapthumb { position: relative; overflow: hidden; }
 .kakiya-mapthumb-inner { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }

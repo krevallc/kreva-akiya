@@ -111,6 +111,15 @@ def parse_detail(session: PoliteSession, url: str) -> AkiyaRecord | None:
         print(f"[takahashi] 座標なしスキップ: {url}")
         return None
 
+    # 物件写真（wp-content/uploads）。リサイズ版（-330x248等）より原寸を優先
+    image_url = None
+    photos = re.findall(
+        r"https://takahashi-akiyabank\.com/wp-content/uploads/[^\"']+\.(?:jpe?g|png|webp)", html
+    )
+    if photos:
+        full = [ph for ph in photos if not re.search(r"-\d+x\d+\.", ph)]
+        image_url = (full or photos)[0]
+
     # 定性情報を説明文に（ライフライン・修繕・周辺施設・特記など＝購入者価値が高い）
     desc_keys = ["水道", "電気", "ガス", "トイレ", "風呂", "キッチン", "駐車場",
                  "修繕の要否", "修繕の負担", "空き家年数", "付帯物件",
@@ -130,6 +139,7 @@ def parse_detail(session: PoliteSession, url: str) -> AkiyaRecord | None:
         "build_year": build_year,
         "address": address,
         "lat": lat, "lng": lng,
+        "image_url": image_url,
         "source_name": SOURCE_NAME,
         "source_url": url,
         "source_id": str(reg_no),

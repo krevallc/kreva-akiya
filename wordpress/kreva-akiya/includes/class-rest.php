@@ -147,7 +147,7 @@ class KREVA_Akiya_REST {
 				'type'        => $this->first_term_name( $post->ID, 'akiya_type' ),
 				'is_kreva'    => $m['is_kreva'],
 				'kuiki_kubun' => $m['kuiki_kubun'],
-				'thumb'       => get_the_post_thumbnail_url( $post->ID, 'medium' ) ?: null,
+				'thumb'       => get_the_post_thumbnail_url( $post->ID, 'medium' ) ?: ( $m['image_url'] ?: null ),
 				'source_name' => $m['source_name'],
 			);
 		}

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-get_header();
+kreva_akiya_header();
 
 // フィルタ用のタクソノミー選択肢
 $prefs  = get_terms( array( 'taxonomy' => 'akiya_pref', 'hide_empty' => false ) );
@@ -101,4 +101,4 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => false ) 
 	</p>
 </div>
 <?php
-get_footer();
+kreva_akiya_footer();

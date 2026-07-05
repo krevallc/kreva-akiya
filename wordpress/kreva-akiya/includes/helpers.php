@@ -49,6 +49,8 @@ function kreva_akiya_meta_schema() {
 		'nearest_shelter_m'   => array( 'type' => 'number', 'label' => '最寄り避難場所まで(m)' ),
 		'liquefaction'        => array( 'type' => 'string', 'label' => '液状化傾向' ),
 		'future_pop'          => array( 'type' => 'string', 'label' => '将来推計人口(参考)' ),
+		// 画像（元サイトの写真URL・直リンク表示用）
+		'image_url'      => array( 'type' => 'string', 'label' => '物件画像URL(外部)' ),
 		// 出所
 		'source_name'    => array( 'type' => 'string', 'label' => '出典名' ),
 		'source_url'     => array( 'type' => 'string', 'label' => '元ページURL' ),
@@ -168,6 +170,44 @@ function kreva_akiya_hazard_tiles() {
 			'url'   => 'https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/{z}/{x}/{y}.png',
 		),
 	);
+}
+
+/**
+ * テーマ種別に応じたヘッダー出力。
+ * ブロックテーマ（Twenty Twenty-Five等）では get_header() がテーマのヘッダーを
+ * 出力しないため、HTML骨格＋テーマの header テンプレートパートを直接描画する。
+ */
+function kreva_akiya_header() {
+	if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+		?><!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+<meta charset="<?php bloginfo( 'charset' ); ?>">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php wp_head(); ?>
+</head>
+<body <?php body_class(); ?>>
+<?php
+		wp_body_open();
+		echo '<div class="wp-site-blocks">';
+		block_template_part( 'header' );
+	} else {
+		get_header();
+	}
+}
+
+/**
+ * テーマ種別に応じたフッター出力（kreva_akiya_header と対）。
+ */
+function kreva_akiya_footer() {
+	if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+		block_template_part( 'footer' );
+		echo '</div>';
+		wp_footer();
+		echo '</body></html>';
+	} else {
+		get_footer();
+	}
 }
 
 /**

@@ -122,7 +122,7 @@
 		a.href = it.permalink;
 		a.id = 'card-' + it.id;
 		a.innerHTML =
-			(it.thumb ? '<div class="kakiya-card-thumb" style="background-image:url(' + esc(it.thumb) + ')"></div>'
+			(it.thumb ? '<div class="kakiya-card-thumb"><img class="kakiya-thumb-img" loading="lazy" referrerpolicy="no-referrer" alt="" src="' + esc(it.thumb) + '"></div>'
 				: mapThumbHtml(it.lat, it.lng)) +
 			'<div class="kakiya-card-body">' +
 			(it.is_kreva ? '<span class="kakiya-tag">KREVA</span>' : '') +
@@ -132,6 +132,14 @@
 			(it.kuiki_kubun ? ' ・' + esc(it.kuiki_kubun) : '') + '</div>' +
 			'</div>';
 		a.addEventListener('mouseenter', function () { var mk = byId[it.id]; if (mk) mk.openPopup(); });
+		// 外部画像が読めない場合は地図サムネへ自動フォールバック
+		var timg = a.querySelector('.kakiya-thumb-img');
+		if (timg) {
+			timg.addEventListener('error', function () {
+				var holder = timg.closest ? timg.closest('.kakiya-card-thumb') : timg.parentNode;
+				if (holder) holder.outerHTML = mapThumbHtml(it.lat, it.lng);
+			});
+		}
 		return a;
 	}
 

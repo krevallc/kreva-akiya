@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-get_header();
+kreva_akiya_header();
 
 while ( have_posts() ) :
 	the_post();
@@ -41,6 +41,13 @@ while ( have_posts() ) :
 			<div class="kakiya-single-left">
 				<?php if ( has_post_thumbnail() ) : ?>
 					<div class="kakiya-photo"><?php the_post_thumbnail( 'large' ); ?></div>
+				<?php elseif ( ! empty( $m['image_url'] ) ) : ?>
+					<div class="kakiya-photo kakiya-photo-ext">
+						<img src="<?php echo esc_url( $m['image_url'] ); ?>" alt="<?php the_title_attribute(); ?>"
+							referrerpolicy="no-referrer" loading="lazy"
+							onerror="this.closest('.kakiya-photo').style.display='none'">
+						<p class="kakiya-note">画像出典：<?php echo esc_html( $m['source_name'] ?: '掲載元' ); ?>（元ページより直接表示）</p>
+					</div>
 				<?php endif; ?>
 
 				<section>
@@ -179,4 +186,4 @@ while ( have_posts() ) :
 	<?php
 endwhile;
 
-get_footer();
+kreva_akiya_footer();

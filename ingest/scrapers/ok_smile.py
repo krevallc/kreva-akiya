@@ -204,6 +204,14 @@ def parse_detail(session: PoliteSession, p_no: str, kind: str = "buy") -> AkiyaR
         print(f"[ok_smile] 座標なしのためスキップ: p_no={p_no}")
         return None
 
+    # 物件写真（subcenter.jp 配信）。タイトル中の表示用物件番号に一致する写真を優先
+    image_url = None
+    photos = re.findall(r"https://[a-z0-9.]+\.subcenter\.jp/[^\"']+\.jpe?g", r.text)
+    if photos:
+        m_disp = re.search(r"物件詳細\((\d+)\)", title)
+        own = [p for p in photos if m_disp and m_disp.group(1) in p]
+        image_url = (own or photos)[0]
+
     city = city_from_address(address or "")
     ptype = type_from_title(title)
 
@@ -219,6 +227,7 @@ def parse_detail(session: PoliteSession, p_no: str, kind: str = "buy") -> AkiyaR
         "youto_chiiki": youto,
         "kenpei": kenpei, "yoseki": yoseki,
         "kuiki_kubun": kuiki,
+        "image_url": image_url,
         "source_name": SOURCE_NAME,
         "source_url": url,
         "source_id": p_no,
