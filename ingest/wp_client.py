@@ -77,6 +77,26 @@ class WPClient:
                 out.append({"ok": False, "title": rec.title, "error": str(e)})
         return out
 
+    def reconcile(self, source_name: str, active_ids: list[str], *,
+                  archive_status: str = "掲載終了", timeout: float = 90.0) -> dict:
+        """在庫照合：source_name の物件のうち active_ids に無いものを archive_status へ。
+
+        元サイトから消えた物件の自動アーカイブ。active_ids が空だとサーバ側の
+        安全弁で 400 になる（＝全件アーカイブしない）。フル取得したソースにのみ使うこと。
+        """
+        if not self.configured:
+            raise RuntimeError("WP_BASE_URL / WP_USER / WP_APP_PASSWORD が未設定です。")
+        url = f"{self.base_url}/wp-json/kreva-akiya/v1/reconcile"
+        r = self.session.post(
+            url,
+            json={"source_name": source_name, "active_ids": list(active_ids),
+                  "archive_status": archive_status},
+            auth=(self.user, self.app_password),
+            timeout=timeout,
+        )
+        r.raise_for_status()
+        return r.json()
+
 
 if __name__ == "__main__":
     # 疎通テスト（.env設定済みなら1件ダミー投入）

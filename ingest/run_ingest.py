@@ -23,7 +23,7 @@ import poc  # _load_dotenv を借用
 from wp_client import WPClient, AkiyaRecord
 from reinfolib import ReinfolibClient
 from scrapers.http import PoliteSession
-from scrapers import ok_smile, ibaragurashi, takahashi
+from scrapers import ok_smile, ibaragurashi, takahashi, niimi, kibichuo
 
 OUT_DIR = pathlib.Path(__file__).parent / "out"
 
@@ -85,12 +85,16 @@ def apply_slugs(records: list[AkiyaRecord]) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="KREVA 空き家 取り込み")
-    ap.add_argument("--source", default="ok_smile", choices=["ok_smile", "ibaragurashi", "takahashi", "all"], help="取り込み元")
+    ap.add_argument("--source", default="ok_smile",
+                    choices=["ok_smile", "ibaragurashi", "takahashi", "niimi", "kibichuo", "all"],
+                    help="取り込み元")
     ap.add_argument("--cities", default="priority", help="priority | all | カンマ区切りコード")
     ap.add_argument("--kinds", default="buy", help="buy,rent（カンマ区切り）")
     ap.add_argument("--limit", type=int, default=None, help="自治体あたりの最大件数（動作確認用）")
     ap.add_argument("--enrich", action="store_true", help="不動産情報ライブラリで周辺情報を付加")
     ap.add_argument("--push", action="store_true", help="WordPress に投入（無指定はドライラン）")
+    ap.add_argument("--reconcile", action="store_true",
+                    help="投入後、元サイトから消えた物件を『掲載終了』にする（フル取得ソースのみ）")
     ap.add_argument("--dry-run", action="store_true", help="JSON出力のみ（明示用）")
     ap.add_argument("--date", default=None, help="last_checked に使う日付 YYYY-MM-DD（既定は本日）")
     args = ap.parse_args()
@@ -116,6 +120,10 @@ def main() -> int:
         records += ibaragurashi.scrape(session, limit=args.limit)
     if args.source in ("takahashi", "all"):
         records += takahashi.scrape(session, limit=args.limit)
+    if args.source in ("niimi", "all"):
+        records += niimi.scrape(session, limit=args.limit)
+    if args.source in ("kibichuo", "all"):
+        records += kibichuo.scrape(session, limit=args.limit)
     print(f"  → {len(records)} 件 収集")
 
     # last_checked
@@ -151,10 +159,63 @@ def main() -> int:
         results = client.upsert_many(records)
         ok = sum(1 for x in results if x.get("ok", True) is not False)
         print(f"  → {ok}/{len(results)} 投入完了")
+
+        if args.reconcile:
+            reconcile_sources(client, records, args)
     else:
         print("（--push 未指定のため WordPress へは書き込みません＝ドライラン）")
+        if args.reconcile:
+            print("※ --reconcile は --push と併用してください（今回はスキップ）。")
 
     return 0
+
+
+# フル取得＝そのソースの全物件を今回収集したと言える条件。
+# 部分取得（priority指定/limit）で照合すると、取得しなかった物件を誤って掲載終了に
+# してしまうため、フル取得のソースだけを照合対象にする。
+def fully_scraped_sources(args) -> set[str]:
+    if args.limit is not None:
+        return set()  # 件数制限中は全件を見ていない
+    out: set[str] = set()
+    # 住まいる岡山は複数自治体にまたがるため、全自治体を回した時のみフル
+    if args.source in ("ok_smile", "all") and args.cities == "all":
+        out.add(ok_smile.SOURCE_NAME)
+    if args.source in ("ibaragurashi", "all"):
+        out.add(ibaragurashi.SOURCE_NAME)
+    if args.source in ("takahashi", "all"):
+        out.add(takahashi.SOURCE_NAME)
+    # 新見の自前バンクは niimi のフル取得でのみ照合対象（住まいる岡山分は ok_smile 側の判定に従う）
+    if args.source in ("niimi", "all"):
+        out.add(niimi.SOURCE_NAME)
+    if args.source in ("kibichuo", "all"):
+        out.add(kibichuo.SOURCE_NAME)
+    return out
+
+
+def reconcile_sources(client: WPClient, records: list[AkiyaRecord], args) -> None:
+    """フル取得したソースについて、今回見つからなかった既存物件を掲載終了にする。"""
+    targets = fully_scraped_sources(args)
+    if not targets:
+        print("■ 在庫照合：フル取得したソースが無いためスキップ（priority/limit指定時など）。")
+        return
+    active: dict[str, set[str]] = {}
+    for r in records:
+        sn = r.meta.get("source_name")
+        sid = r.meta.get("source_id")
+        if sn and sid is not None:
+            active.setdefault(sn, set()).add(str(sid))
+    print("■ 在庫照合（掲載終了の自動アーカイブ）")
+    for sn in sorted(targets):
+        ids = sorted(active.get(sn, set()))
+        if not ids:
+            print(f"  {sn}: 収集0件のため照合スキップ（安全弁）。")
+            continue
+        try:
+            res = client.reconcile(sn, ids)
+            print(f"  {sn}: 照合{res.get('checked')}件 → 掲載終了 {res.get('archived')}件"
+                  f"（現存{res.get('active')} / 既終端{res.get('skipped')}）")
+        except Exception as e:  # noqa: BLE001
+            print(f"  {sn}: 照合失敗: {e}")
 
 
 if __name__ == "__main__":

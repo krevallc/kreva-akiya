@@ -41,6 +41,18 @@ class KREVA_Akiya_REST {
 				},
 			)
 		);
+
+		register_rest_route(
+			self::NS,
+			'/reconcile',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'reconcile' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -135,12 +147,12 @@ class KREVA_Akiya_REST {
 			);
 		}
 
-		// 成約済は既定で除外（include_sold=1 で含める）
+		// 成約済・掲載終了は既定で除外（include_sold=1 で含める）
 		if ( '1' !== (string) $req->get_param( 'include_sold' ) ) {
 			$tax_query[] = array(
 				'taxonomy' => 'akiya_status',
 				'field'    => 'name',
-				'terms'    => array( '成約済' ),
+				'terms'    => array( '成約済', '掲載終了' ),
 				'operator' => 'NOT IN',
 			);
 		}
@@ -292,6 +304,80 @@ class KREVA_Akiya_REST {
 				'permalink' => get_permalink( $post_id ),
 			),
 			$existing ? 200 : 201
+		);
+	}
+
+	/**
+	 * 在庫照合（掲載終了の自動アーカイブ）。
+	 * 指定 source_name の全公開物件のうち、今回のスクレイプで確認できた source_id 集合
+	 * （active_ids）に含まれないものを、元サイトから消えたとみなして「掲載終了」へ落とす。
+	 *
+	 * body: { source_name: string, active_ids: string[], archive_status?: string }
+	 *
+	 * 安全弁：
+	 *  - active_ids が空なら中止（スクレイプ全失敗時の全件アーカイブを防ぐ）。
+	 *  - 呼び出し側（run_ingest）は「フル取得したソースのみ」照合する。
+	 *  - 一時的なパース失敗で誤アーカイブされても、次回の upsert が status を
+	 *    再設定するため自己修復する（本当に消えた物件だけが掲載終了で残る）。
+	 */
+	public function reconcile( WP_REST_Request $req ) {
+		$body   = $req->get_json_params();
+		$source = ( is_array( $body ) && isset( $body['source_name'] ) ) ? (string) $body['source_name'] : '';
+		$active = ( is_array( $body ) && isset( $body['active_ids'] ) && is_array( $body['active_ids'] ) ) ? $body['active_ids'] : null;
+		$arch   = ( is_array( $body ) && ! empty( $body['archive_status'] ) ) ? sanitize_text_field( (string) $body['archive_status'] ) : '掲載終了';
+
+		if ( '' === $source ) {
+			return new WP_Error( 'kakiya_no_source', 'source_name が必要です', array( 'status' => 400 ) );
+		}
+		if ( null === $active || 0 === count( $active ) ) {
+			// スクレイプ0件で全件アーカイブされるのを防ぐ安全弁
+			return new WP_Error( 'kakiya_empty_active', 'active_ids が空のため照合を中止しました（安全弁）', array( 'status' => 400 ) );
+		}
+
+		$active_map = array();
+		foreach ( $active as $sid ) {
+			$active_map[ (string) $sid ] = true;
+		}
+
+		$posts = get_posts( array(
+			'post_type'   => KREVA_Akiya_CPT::POST_TYPE,
+			'post_status' => 'publish',
+			'numberposts' => -1,
+			'fields'      => 'ids',
+			'meta_query'  => array(
+				array( 'key' => kreva_akiya_meta_key( 'source_name' ), 'value' => $source ),
+			),
+		) );
+
+		$archived = array();
+		$skipped  = 0;
+		foreach ( $posts as $pid ) {
+			$sid = (string) get_post_meta( $pid, kreva_akiya_meta_key( 'source_id' ), true );
+			if ( '' === $sid || isset( $active_map[ $sid ] ) ) {
+				continue; // ソースに現存 → 触らない
+			}
+			// 既に終端ステータス（掲載終了 / 成約済）ならスキップ
+			$terms = wp_get_object_terms( $pid, 'akiya_status', array( 'fields' => 'names' ) );
+			if ( is_array( $terms ) && ( in_array( $arch, $terms, true ) || in_array( '成約済', $terms, true ) ) ) {
+				$skipped++;
+				continue;
+			}
+			wp_set_object_terms( $pid, $arch, 'akiya_status', false );
+			$archived[] = $pid;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'ok'             => true,
+				'source_name'    => $source,
+				'active'         => count( $active ),
+				'checked'        => count( $posts ),
+				'archived'       => count( $archived ),
+				'skipped'        => $skipped,
+				'archived_ids'   => $archived,
+				'archive_status' => $arch,
+			),
+			200
 		);
 	}
 

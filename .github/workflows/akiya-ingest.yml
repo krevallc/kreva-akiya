@@ -24,7 +24,7 @@ on:
       source:
         description: "取り込み元"
         type: choice
-        options: [all, ok_smile, ibaragurashi, takahashi]
+        options: [all, ok_smile, ibaragurashi, takahashi, niimi, kibichuo]
         default: all
       cities:
         description: "対象自治体（priority / all / カンマ区切りコード）"
@@ -32,6 +32,10 @@ on:
         default: all
       push:
         description: "WordPressへ投入する（falseならドライラン）"
+        type: boolean
+        default: true
+      reconcile:
+        description: "消えた物件を掲載終了にする（フル取得ソースのみ照合）"
         type: boolean
         default: true
       limit:
@@ -73,9 +77,11 @@ jobs:
           SOURCE="${{ github.event.inputs.source || 'all' }}"
           CITIES="${{ github.event.inputs.cities || 'all' }}"
           PUSH="${{ github.event.inputs.push || 'true' }}"
+          RECONCILE="${{ github.event.inputs.reconcile || 'true' }}"
           LIMIT="${{ github.event.inputs.limit }}"
           ARGS="--source $SOURCE --cities $CITIES --enrich"
           if [ "$PUSH" = "true" ]; then ARGS="$ARGS --push"; else ARGS="$ARGS --dry-run"; fi
+          if [ "$RECONCILE" = "true" ]; then ARGS="$ARGS --reconcile"; fi
           if [ -n "$LIMIT" ]; then ARGS="$ARGS --limit $LIMIT"; fi
           echo "実行: python run_ingest.py $ARGS"
           python run_ingest.py $ARGS
