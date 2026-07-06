@@ -63,6 +63,10 @@ class KREVA_Akiya_Templates {
 		if ( is_front_page() && apply_filters( 'kreva_akiya_render_home', true ) ) {
 			return KREVA_AKIYA_DIR . 'templates/home.php';
 		}
+		// MTKN事業ページ
+		if ( is_page( 'mtkn' ) && apply_filters( 'kreva_akiya_render_mtkn', true ) ) {
+			return KREVA_AKIYA_DIR . 'templates/mtkn.php';
+		}
 		// テーマが用意していればそれを尊重
 		if ( is_post_type_archive( KREVA_Akiya_CPT::POST_TYPE ) || is_tax( array( 'akiya_pref', 'akiya_city', 'akiya_type', 'akiya_status' ) ) ) {
 			$theme = locate_template( array( 'archive-akiya.php' ) );

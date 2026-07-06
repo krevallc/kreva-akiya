@@ -23,8 +23,9 @@ class KREVA_Akiya_Assets {
 	}
 
 	public function enqueue() {
-		// HOME（フロントページ）はCSSとフォントのみ（地図JS不要）
-		if ( is_front_page() && apply_filters( 'kreva_akiya_render_home', true ) ) {
+		// HOME・MTKNページはCSSとフォントのみ（地図JS不要）
+		if ( ( is_front_page() && apply_filters( 'kreva_akiya_render_home', true ) )
+			|| ( is_page( 'mtkn' ) && apply_filters( 'kreva_akiya_render_mtkn', true ) ) ) {
 			wp_enqueue_style(
 				'kreva-akiya-font',
 				'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap',

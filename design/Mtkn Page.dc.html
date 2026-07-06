@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!--
+MTKN 事業紹介ページ（kreva.co.jp/mtkn/ 実装移植用）
+■ DESIGN TOKENS（サイト共通）
+ Color: --accent #b3541e / --ink #211d19 / --sub #6f6a63 / --line #e7e3dc / --bg #faf9f6
+ ダークセクション: 背景 var(--ink) / 本文 #c9c2b8 / チップ白枠アウトライン / kicker #e0a37f
+ Type: 'Noto Sans JP' 本文14px 行間1.9 / 見出し・数字 weight900（H1 34px / H2 24px）/ 11–13px=メタ・ラベル
+ Radius: pill・ボタン999px / カード16px / バナー20px　Shadow: hover 0 10px 28px rgba(28,24,18,.12)
+ Breakpoint: 820px
+■ セクション構成
+ 1 ヘッダー（共通：ロゴ＋ナビ＋お問合せピル）
+ 2 ヒーロー（ダーク・コピー「日本のデニムを、欧州へ。」＋mtkn.nl CTA＋写真スロット大）
+ 3 コンセプト（岡山デニム＝児島・井原の読み物ブロック＋物撮り写真）
+ 4 事業の仕組み（3ステップ：日本で買付 → アムステルダム拠点 → 欧州へ販売）
+ 5 取扱いブランド（テキストチップ一覧・ロゴ画像不使用）
+ 6 現地での活動（Denim Days出展※実写あり／Kingpins／House of Denim）
+ 7 日本のメーカー様へ（提携相談CTAバナー・accent淡色）
+ 8 mtkn.nl 大CTA（ダーク・ストアキャプチャスロット※実素材あり＋ボタン）
+ 9 フッター
+ ※写真はimage-slot（ドラッグ&ドロップで実写に差し替え可能）
+-->
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#faf9f6;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.slot{position:relative;width:100%}
+image-slot{display:block;width:100%;height:100%}
+.hdr{height:64px;padding:0 24px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:50}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff}
+.tag{font-size:11px;color:var(--sub)}
+.nl{color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:500;white-space:nowrap}
+.nl:hover{color:var(--ink)}
+.nl.now{color:var(--ink);font-weight:700}
+.lang{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;color:var(--sub);font-family:inherit}
+.cta{background:var(--accent);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+.cta:hover{filter:brightness(.94)}
+.big{padding:15px 36px;font-size:14px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.dark{background:var(--ink);color:#c9c2b8}
+.dark .h1{color:#fff}
+.dark .h2{color:#fff}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.18em;color:var(--accent);margin-bottom:16px}
+.dark .kicker{color:#e0a37f}
+.h1{font-size:34px;font-weight:900;line-height:1.5;margin:0 0 18px;text-wrap:pretty}
+.h2{font-size:24px;font-weight:900;margin:0;line-height:1.4}
+.lead{font-size:14px;line-height:1.9;margin:0 0 28px;max-width:44em}
+.dark .lead{color:#c9c2b8}
+.hero{padding:72px 0 64px}
+.hgrid{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.mc{font-size:11.5px;font-weight:700;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 12px;color:#c9c2b8}
+.ghost{display:inline-block;border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:999px;padding:12px 26px;font-weight:700;font-size:13px;text-decoration:none}
+.ghost:hover{background:#fff;color:var(--ink);border-color:#fff}
+.sec{padding:72px 0}
+.shead{margin-bottom:32px}
+.sdesc{font-size:13px;color:var(--sub);margin:8px 0 0;line-height:1.9}
+.cgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center}
+.p{font-size:14px;line-height:1.9;color:#4c4841;margin:0 0 14px;text-wrap:pretty}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 24px;position:relative}
+.sno{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;display:block;margin-bottom:12px}
+.st{font-size:16px;font-weight:700;line-height:1.5;margin:0 0 8px}
+.sp{font-size:12.5px;line-height:1.9;color:var(--sub);margin:0}
+.arrow{position:absolute;top:50%;right:-16px;transform:translateY(-50%);z-index:2;color:#b8b1a6;font-size:14px;font-weight:700}
+.schips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.sc{font-size:11px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--sub)}
+.brands{display:flex;gap:10px;flex-wrap:wrap}
+.bc{font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 18px}
+.bnote{font-size:12px;color:#96908a;margin-top:16px}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.act{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:box-shadow .18s,transform .18s}
+.act:hover{box-shadow:0 10px 28px rgba(28,24,18,.12);transform:translateY(-2px)}
+.ab{padding:18px 20px 20px}
+.at{font-size:15px;font-weight:700;margin:0 0 6px}
+.am{font-size:11px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:0 0 8px}
+.ap{font-size:12.5px;line-height:1.9;color:var(--sub);margin:0}
+.mkr{background:color-mix(in oklab,var(--accent) 9%,#fff);border:1px solid color-mix(in oklab,var(--accent) 22%,#fff);border-radius:20px;padding:44px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.mkh{font-size:22px;font-weight:900;margin:0 0 8px}
+.mkp{font-size:13px;color:#4c4841;margin:0;line-height:1.9;max-width:38em}
+.store{padding:72px 0}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.surl{font-size:13px;letter-spacing:.12em;color:#e0a37f;font-weight:700;margin-bottom:12px}
+.ftr{border-top:1px solid var(--line);background:var(--bg);padding:40px 0 28px}
+.fgrid{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px}
+.fl{font-size:12.5px;color:var(--sub);text-decoration:none;display:block;margin-bottom:10px}
+.fl:hover{color:var(--accent)}
+.fh2{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--ink);margin:0 0 12px}
+.fbase{font-size:11.5px;color:#96908a;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:820px){
+.navr{display:none}
+.hdr{padding:0 16px}
+.wrap{padding:0 16px}
+.hero{padding:48px 0}
+.h1{font-size:26px}
+.sec{padding:52px 0}
+.hgrid{grid-template-columns:1fr;gap:32px}
+.cgrid{grid-template-columns:1fr;gap:32px}
+.steps{grid-template-columns:1fr}
+.arrow{display:none}
+.acts{grid-template-columns:1fr}
+.sgrid{grid-template-columns:1fr;gap:32px}
+.mkr{padding:32px 24px}
+.store{padding:52px 0}
+}
+</style>
+</helmet>
+<div class="page">
+<header class="hdr fx ac jb"><div class="fx ac gap10"><div class="logo fx ac jc fw8 fs16">K</div><div><div class="fw8 fs15" style="letter-spacing:.08em">KREVA</div><div class="tag">合同会社クレバ</div></div></div><nav class="navr fx ac gap16"><a class="nl" href="Kreva Home.dc.html">Home</a><a class="nl" href="Kreva Home.dc.html#biz">不動産事業</a><a class="nl now" href="#">MTKN</a><a class="nl" href="Kreva Home.dc.html#biz">Web制作・システム開発</a><a class="nl" href="Kreva Home.dc.html#about">会社概要</a><a class="nl" href="Kreva Home.dc.html#contact">お問い合わせ</a></nav><div class="fx ac gap10"><button class="lang">EN</button><a class="cta" href="Kreva Home.dc.html#contact">お問合せ</a></div></header>
+<section class="hero dark"><div class="wrap hgrid">
+<div><div class="kicker">MTKN — AMSTERDAM</div><h1 class="h1">日本のデニムを、<br>欧州へ。</h1><div class="chips"><span class="mc">日本製ヴィンテージ</span><span class="mc">国産デニム</span><span class="mc">アムステルダム拠点</span></div><p class="lead">MTKNは、日本製ヴィンテージと国産デニムを中心とする日本製衣料を、アムステルダムから欧州へ届けるプロジェクトです。日本人兄弟2人が、大阪・岡山とアムステルダムの2拠点で運営しています。</p><a class="ghost" href="https://mtkn.nl" target="_blank" rel="noopener">mtkn.nl を見る ↗</a></div>
+<div class="slot" style="height:400px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-hero" shape="rounded" radius="20" placeholder="ヒーロー写真｜デニム物撮りなど" style="width:100%;height:100%" hint-size="100%,400px"></x-import></div>
+</div></section>
+<section class="sec" style="background:var(--bg)"><div class="wrap cgrid">
+<div><div class="kicker">CONCEPT</div><h2 class="h2" style="margin-bottom:18px">岡山デニムの魅力を、世界へ。</h2><p class="p">岡山の児島・井原は、国産デニムの聖地と呼ばれる土地です。ジーンズの国内生産発祥の地として知られ、カイハラやクロキといった世界的なデニム生地の産地とも地続きの文化圏に、確かなものづくりが息づいています。</p><p class="p">MTKNは、この産地の縁を背景に、日本製ヴィンテージと国産デニムをキュレーション。1本1本の状態を確かめ、つくり手の仕事が伝わるかたちで、ヨーロッパのデニムファンへ届けています。</p></div>
+<div class="slot" style="height:360px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-product" shape="rounded" radius="16" placeholder="物撮り写真（実素材あり）" style="width:100%;height:100%" hint-size="100%,360px"></x-import></div>
+</div></section>
+<section class="sec"><div class="wrap">
+<div class="shead"><div class="kicker">HOW IT WORKS</div><h2 class="h2">事業の仕組み</h2><p class="sdesc">日本での買付から欧州のお客様の手元まで、2拠点で一貫して運営しています。</p></div>
+<div class="steps">
+<div class="step"><span class="sno mono">STEP 01 — JAPAN</span><h3 class="st">日本で買付・キュレーション</h3><p class="sp">大阪・岡山を拠点に、日本製ヴィンテージと国産デニムを1点ずつ選定。状態確認とメンテナンスを行います。</p><span class="arrow">→</span></div>
+<div class="step"><span class="sno mono">STEP 02 — AMSTERDAM</span><h3 class="st">アムステルダム拠点へ</h3><p class="sp">欧州側の拠点アムステルダムで在庫を管理。現地のデニムコミュニティとつながりながら販売の場を広げています。</p><span class="arrow">→</span></div>
+<div class="step"><span class="sno mono">STEP 03 — EUROPE</span><h3 class="st">欧州へ販売</h3><p class="sp">自社オンラインストア mtkn.nl を中心に、複数のマーケットプレイスで欧州全域のお客様へ販売しています。</p><div class="schips"><span class="sc">mtkn.nl</span><span class="sc">eBay</span><span class="sc">Grailed</span><span class="sc">Vinted</span></div></div>
+</div>
+</div></section>
+<section class="sec" style="background:var(--bg);padding-top:0"><div class="wrap">
+<div class="shead"><div class="kicker">BRANDS</div><h2 class="h2">取扱いブランド</h2><p class="sdesc">中古・ヴィンテージを含む取扱実績の一例です。</p></div>
+<div class="brands"><span class="bc">DENIM BRIDGE</span><span class="bc">HANDS-ON</span><span class="bc">MEPSE &amp; Co.</span><span class="bc">WASEW</span><span class="bc">Naturals.</span></div>
+<p class="bnote">ほか、日本ブランドを多数取り扱っています。在庫は時期により変動します。</p>
+</div></section>
+<section class="sec"><div class="wrap">
+<div class="shead"><div class="kicker">COMMUNITY</div><h2 class="h2">現地での活動</h2><p class="sdesc">アムステルダムのデニムコミュニティに根ざして活動しています。</p></div>
+<div class="acts">
+<article class="act"><div class="slot" style="height:220px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-denimdays" shape="rect" placeholder="Denim Days 出展写真（実素材あり）" style="width:100%;height:100%" hint-size="100%,220px"></x-import></div><div class="ab"><p class="am mono">DENIM DAYS AMSTERDAM</p><h3 class="at">マーケットブース出展</h3><p class="ap">アムステルダムのデニムの祭典 Denim Days にマーケットブースを出展。現地のファンと直接交流しています。</p></div></article>
+<article class="act"><div class="slot" style="height:220px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-kingpins" shape="rect" placeholder="Kingpins 会場写真" style="width:100%;height:100%" hint-size="100%,220px"></x-import></div><div class="ab"><p class="am mono">KINGPINS SHOW</p><h3 class="at">デニム見本市への参加</h3><p class="ap">世界最大級のデニム見本市 Kingpins Show に参加。生地・トレンドの最前線から知見を持ち帰っています。</p></div></article>
+<article class="act"><div class="slot" style="height:220px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-hod" shape="rect" placeholder="コミュニティ交流写真" style="width:100%;height:100%" hint-size="100%,220px"></x-import></div><div class="ab"><p class="am mono">HOUSE OF DENIM</p><h3 class="at">財団・コミュニティとの交流</h3><p class="ap">House of Denim財団をはじめ、アムステルダムのデニム関係者との交流を通じて活動を広げています。</p></div></article>
+</div>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="mkr"><div><div class="kicker" style="margin-bottom:10px">FOR MAKERS</div><h2 class="mkh">日本のメーカー様へ</h2><p class="mkp">海外販路をお探しの衣料製造企業様へ。欧州での販売代行・テスト販売・現地コミュニティへの橋渡しなど、提携のご相談を承っています。まずはお気軽にお問い合わせください。</p></div><a class="cta big" href="Kreva Home.dc.html#contact">提携のご相談はこちら</a></div>
+</div></section>
+<section class="store dark"><div class="wrap sgrid">
+<div class="slot" style="height:340px"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="mtkn-store" shape="rounded" radius="16" placeholder="mtkn.nl ストアキャプチャ（実素材あり）" style="width:100%;height:100%" hint-size="100%,340px"></x-import></div>
+<div><div class="surl mono">MTKN.NL — ONLINE STORE</div><h2 class="h2" style="margin-bottom:16px">オンラインストアを見る</h2><p class="lead" style="margin-bottom:24px">最新の入荷アイテムは自社オンラインストアでご覧いただけます。欧州全域への配送に対応しています。</p><a class="ghost" href="https://mtkn.nl" target="_blank" rel="noopener">mtkn.nl へ ↗</a></div>
+</div></section>
+<footer class="ftr"><div class="wrap">
+<div class="fgrid">
+<div><div class="fx ac gap10 mb12"><div class="logo fx ac jc fw8 fs14" style="width:28px;height:28px">K</div><span class="fw8 fs14" style="letter-spacing:.08em">KREVA</span></div><p class="fl" style="margin:0">合同会社クレバ<br>大阪府高槻市｜岡山｜アムステルダム</p></div>
+<div><p class="fh2">事業</p><a class="fl" href="Kreva Home.dc.html#biz">不動産事業</a><a class="fl" href="#">MTKN</a><a class="fl" href="Kreva Home.dc.html#biz">Web制作・システム開発</a></div>
+<div><p class="fh2">会社</p><a class="fl" href="Kreva Home.dc.html#about">会社概要</a><a class="fl" href="Kreva Home.dc.html#contact">お問い合わせ</a><a class="fl" href="#">プライバシーポリシー</a></div>
+</div>
+<div class="fbase"><span>© 2026 KREVA LLC</span><span>kreva.co.jp/mtkn/</span></div>
+</div></footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#33568f&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#b3541e&quot;,&quot;#2f6f6a&quot;,&quot;#33568f&quot;],&quot;section&quot;:&quot;ブランド&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { this.applyAccent(); }
+  componentDidUpdate() { this.applyAccent(); }
+  applyAccent() { document.body.style.setProperty('--accent', this.props.accent ?? '#b3541e'); }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
