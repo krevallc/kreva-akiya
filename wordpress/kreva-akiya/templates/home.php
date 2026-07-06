@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $akiya_live = (bool) apply_filters( 'kreva_home_akiya_live', get_option( 'kreva_akiya_home_live', 0 ) );
+$hide_ams   = (bool) apply_filters( 'kreva_hide_amsterdam', false ); // アムステルダム表記の非表示スイッチ
 
 $archive_url = get_post_type_archive_link( 'akiya' );
 $akiya_count = 0;
@@ -82,12 +83,12 @@ kreva_akiya_header();
 						<span class="kh-stat"><span class="kh-sv">2018</span>年設立</span>
 					</div>
 				<?php else : ?>
-					<div class="kh-kicker">KREVA LLC — OSAKA / AMSTERDAM</div>
+					<div class="kh-kicker">KREVA LLC — OSAKA / OKAYAMA<?php echo $hide_ams ? '' : ' / AMSTERDAM'; ?></div>
 					<h1 class="kh-h1">大阪の不動産と、<br>日本のものづくりを世界へ。</h1>
 					<p class="kh-lead">合同会社クレバは、大阪府下における不動産投資・所有物件の運営管理を軸に、日本製衣料の欧州輸出（MTKN）、AIを活用したWeb制作・システム開発を手がける会社です。</p>
 					<div class="kh-stats">
 						<span class="kh-stat"><span class="kh-sv">2018</span>年設立</span>
-						<span class="kh-stat"><span class="kh-sv">2</span>拠点（大阪・アムステルダム）</span>
+						<span class="kh-stat"><span class="kh-sv"><?php echo $hide_ams ? '2' : '3'; ?></span>拠点（大阪・岡山<?php echo $hide_ams ? '' : '・アムステルダム'; ?>）</span>
 					</div>
 				<?php endif; ?>
 			</div>
@@ -210,18 +211,17 @@ kreva_akiya_header();
 		<div class="kh-wrap kh-about">
 			<div>
 				<h2 class="kh-h2">会社概要</h2>
-				<p class="kh-sdesc"><?php echo $akiya_live ? '大阪・岡山・アムステルダムの3拠点で事業を展開しています。' : '大阪・アムステルダムの2拠点で事業を展開しています。'; ?></p>
+				<p class="kh-sdesc"><?php echo $hide_ams ? '大阪・岡山を拠点に事業を展開しています。' : '大阪・岡山・アムステルダムの3拠点で事業を展開しています。'; ?></p>
 				<p style="margin-top:20px"><a class="kh-alink" href="<?php echo esc_url( $url_company ); ?>">会社概要を見る →</a></p>
 			</div>
 			<div>
 				<div class="kakiya-tr"><span class="kakiya-tl">社名</span><span class="kakiya-tv">合同会社クレバ（KREVA LLC）</span></div>
 				<div class="kakiya-tr"><span class="kakiya-tl">設立</span><span class="kakiya-tv">2018年</span></div>
 				<div class="kakiya-tr"><span class="kakiya-tl">本社</span><span class="kakiya-tv">大阪府高槻市</span></div>
+				<div class="kakiya-tr"><span class="kakiya-tl">拠点</span><span class="kakiya-tv">大阪（高槻）・岡山<?php echo $hide_ams ? '' : '・アムステルダム'; ?></span></div>
 				<?php if ( $akiya_live ) : ?>
-					<div class="kakiya-tr"><span class="kakiya-tl">拠点</span><span class="kakiya-tv">大阪（高槻）・岡山・アムステルダム</span></div>
 					<div class="kakiya-tr"><span class="kakiya-tl">事業内容</span><span class="kakiya-tv">不動産投資・運営管理／空き家の再生・検索サービス運営／日本製ヴィンテージ・国産デニムの輸出販売（MTKN）／Web制作・システム開発</span></div>
 				<?php else : ?>
-					<div class="kakiya-tr"><span class="kakiya-tl">拠点</span><span class="kakiya-tv">大阪（高槻）・アムステルダム</span></div>
 					<div class="kakiya-tr"><span class="kakiya-tl">事業内容</span><span class="kakiya-tv">不動産の売買及び賃貸業／海外向け衣料輸出業（MTKN）／Web制作・システム開発</span></div>
 				<?php endif; ?>
 			</div>

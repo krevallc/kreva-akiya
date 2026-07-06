@@ -346,6 +346,96 @@
 	.km-photo-concept { height: 260px; }
 }
 
+/* ===================== コーポレート4ページ v0.9（realestate/web/company/contact） ===================== */
+.kreva-corp { --accent: #b3541e; --ink: #211d19; --sub: #6f6a63; --line: #e7e3dc; --bg: #faf9f6;
+	font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif; color: var(--ink);
+	-webkit-font-smoothing: antialiased; width: 100vw; margin-left: calc(50% - 50vw); background: #fff; }
+.kp-hero { padding: 64px 0; }
+.kp-hero-bg { background: var(--bg); }
+.kp-h1 { font-size: 34px; font-weight: 900; line-height: 1.5; margin: 0 0 18px; }
+.kp-lead { font-size: 14px; line-height: 1.9; margin: 0; max-width: 44em; color: #4c4841; }
+.kp-hgrid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; }
+.kp-heroimg { border-radius: 20px; overflow: hidden; height: 380px; background: #eae6df; }
+.kp-heroimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kp-sec { padding: 64px 0; }
+.kp-shead { margin-bottom: 32px; }
+.kp-g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.kp-feat { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 26px 24px; }
+.kp-fno { font-size: 11px; letter-spacing: .14em; color: var(--accent); font-weight: 700; display: block; margin-bottom: 12px; font-family: ui-monospace, Menlo, monospace; }
+.kp-ft { font-size: 16px; font-weight: 700; line-height: 1.5; margin: 0 0 8px; }
+.kp-fp { font-size: 12.5px; line-height: 1.9; color: var(--sub); margin: 0; }
+/* 物件カード（realestate） */
+.kp-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: box-shadow .18s, transform .18s; }
+.kp-card:hover { box-shadow: 0 10px 28px rgba(28,24,18,.12); transform: translateY(-2px); }
+.kp-ph { height: 200px; overflow: hidden; background: repeating-linear-gradient(45deg, #edeae4 0 14px, #e3dfd7 14px 28px); }
+.kp-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kp-cb { padding: 16px 20px 20px; }
+.kp-cl { font-size: 11px; letter-spacing: .1em; color: var(--accent); font-weight: 700; margin: 0 0 6px; font-family: ui-monospace, Menlo, monospace; }
+.kp-ct { font-size: 15px; font-weight: 700; margin: 0 0 8px; line-height: 1.5; }
+.kp-cm { font-size: 12.5px; color: var(--sub); margin: 0; line-height: 1.9; }
+/* サービスカード（web） */
+.kp-svc { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px 26px; transition: box-shadow .18s, transform .18s; }
+.kp-svc:hover { box-shadow: 0 10px 28px rgba(28,24,18,.12); transform: translateY(-2px); }
+.kp-ico { width: 44px; height: 44px; border-radius: 12px; background: #f7e9e0; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; margin-bottom: 16px; }
+.kp-st { font-size: 17px; font-weight: 700; margin: 0 0 8px; line-height: 1.5; }
+.kp-sp { font-size: 13px; line-height: 1.9; color: var(--sub); margin: 0; }
+/* ダーク強みセクション（web） */
+.kp-dark { background: var(--ink); color: #c9c2b8; }
+.kp-dark .kh-h2 { color: #fff; }
+.kp-dark .kh-kicker { color: #e0a37f; }
+.kp-pnum { font-size: 28px; font-weight: 900; color: #e0a37f; display: block; margin-bottom: 10px; font-family: ui-monospace, Menlo, monospace; }
+.kp-pt { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.kp-pp { font-size: 12.5px; line-height: 1.9; color: #c9c2b8; margin: 0; }
+/* 制作の流れ（web） */
+.kp-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.kp-fstep { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px 20px; position: relative; }
+.kp-arr { position: absolute; top: 50%; right: -16px; transform: translateY(-50%); color: #b8b1a6; font-size: 14px; font-weight: 700; z-index: 2; }
+/* 会社情報表・拠点（company） */
+.kp-tbl { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 8px 28px; }
+.kp-tr { display: grid; grid-template-columns: 160px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.kp-tr:last-child { border-bottom: none; }
+.kp-tl { color: var(--sub); }
+.kp-tv { font-weight: 500; line-height: 1.9; }
+.kp-locs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.kp-loc { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+.kp-lk { font-size: 11px; letter-spacing: .12em; color: var(--accent); font-weight: 700; font-family: ui-monospace, Menlo, monospace; }
+.kp-lt { font-size: 16px; font-weight: 700; margin: 8px 0; }
+.kp-lp { font-size: 12.5px; line-height: 1.9; color: var(--sub); margin: 0; }
+/* お問い合わせ（contact）— CF7出力に汎用セレクタで適用 */
+.kp-cols { display: flex; gap: 32px; align-items: flex-start; }
+.kp-formcard { flex: 1; min-width: 0; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 36px; max-width: 640px; }
+.kp-formcard label { display: block; font-size: 13px; font-weight: 700; margin: 0 0 8px; }
+.kp-formcard input[type="text"], .kp-formcard input[type="email"], .kp-formcard input[type="tel"], .kp-formcard input[type="url"], .kp-formcard textarea {
+	width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; background: var(--bg);
+	padding: 13px 16px; font-size: 14px; font-family: inherit; color: var(--ink); margin: 6px 0 22px;
+	outline: none; transition: border-color .15s, background .15s; }
+.kp-formcard input:focus, .kp-formcard textarea:focus { border-color: var(--accent); background: #fff; }
+.kp-formcard textarea { min-height: 180px; resize: vertical; line-height: 1.9; }
+.kp-formcard input[type="submit"], .kp-formcard button[type="submit"] {
+	background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 15px 44px;
+	font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+.kp-formcard input[type="submit"]:hover, .kp-formcard button[type="submit"]:hover { filter: brightness(.94); }
+.kp-formcard .wpcf7-not-valid-tip { font-size: 12px; color: #c2413a; margin-top: -16px; margin-bottom: 16px; display: block; }
+.kp-formcard .wpcf7-response-output { border-radius: 12px; padding: 12px 16px; font-size: 13px; margin: 16px 0 0; }
+.kp-aside { width: 320px; flex: none; }
+.kp-note { background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.kp-nh { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+.kp-np { font-size: 12.5px; line-height: 1.9; color: var(--sub); margin: 0; }
+@media (max-width: 820px) {
+	.kp-hero { padding: 44px 0; }
+	.kp-h1 { font-size: 26px; }
+	.kp-sec { padding: 48px 0; }
+	.kp-hgrid { grid-template-columns: 1fr; gap: 32px; }
+	.kp-heroimg { height: 240px; }
+	.kp-g3, .kp-flow, .kp-locs { grid-template-columns: 1fr; }
+	.kp-arr { display: none; }
+	.kp-tbl { padding: 4px 20px; }
+	.kp-tr { grid-template-columns: 104px 1fr; }
+	.kp-cols { flex-direction: column; }
+	.kp-aside { width: 100%; }
+	.kp-formcard { padding: 24px 20px; max-width: none; width: 100%; box-sizing: border-box; }
+}
+
 /* ===================== 旧詳細ページ互換（未使用クラスの残置分） ===================== */
 .kakiya-single { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .kakiya-badge { display: inline-block; background: var(--accent); color: #fff; font-size: .8rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }

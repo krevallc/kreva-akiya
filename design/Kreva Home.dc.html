@@ -158,12 +158,12 @@ body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#
 <div><div class="kicker">MTKN — AMSTERDAM</div><h2 class="h2" style="margin-bottom:16px">日本のデニムを、欧州へ。</h2><div class="mchips"><span class="mc">日本製ヴィンテージ</span><span class="mc">国産デニム</span><span class="mc">アムステルダム拠点</span></div><p class="mp">MTKNは、日本製ヴィンテージと国産デニムをアムステルダムを拠点に欧州へ輸出販売するプロジェクトです。長く受け継がれてきた日本のものづくり文化を、確かな品質とともにヨーロッパのファンへ届けています。</p><a class="ghost" href="https://mtkn.nl" target="_blank" rel="noopener">mtkn.nl を見る ↗</a></div>
 </div></section>
 <section class="sec" id="about"><div class="wrap about">
-<div><h2 class="h2">会社概要</h2><p class="sdesc">大阪・岡山・アムステルダムの3拠点で事業を展開しています。</p><p style="margin-top:20px"><a class="alink" href="#">会社概要を見る →</a></p></div>
+<div><h2 class="h2">会社概要</h2><sc-if value="{{ showAms }}" hint-placeholder-val="{{ true }}"><p class="sdesc">大阪・岡山・アムステルダムの3拠点で事業を展開しています。</p></sc-if><sc-if value="{{ hideAms }}" hint-placeholder-val="{{ false }}"><p class="sdesc">大阪・岡山を拠点に事業を展開しています。</p></sc-if><p style="margin-top:20px"><a class="alink" href="#">会社概要を見る →</a></p></div>
 <div>
 <div class="tr"><span class="tl">社名</span><span class="tv">合同会社クレバ（KREVA LLC）</span></div>
 <div class="tr"><span class="tl">設立</span><span class="tv">2018年</span></div>
 <div class="tr"><span class="tl">本社</span><span class="tv">大阪府高槻市</span></div>
-<div class="tr"><span class="tl">拠点</span><span class="tv">大阪（高槻）・岡山・アムステルダム</span></div>
+<div class="tr"><span class="tl">拠点</span><sc-if value="{{ showAms }}" hint-placeholder-val="{{ true }}"><span class="tv">大阪（高槻）・岡山・アムステルダム</span></sc-if><sc-if value="{{ hideAms }}" hint-placeholder-val="{{ false }}"><span class="tv">大阪（高槻）・岡山</span></sc-if></div>
 <div class="tr"><span class="tl">事業内容</span><span class="tv">不動産投資・運営管理／空き家の再生・検索サービス運営／日本製ヴィンテージ・国産デニムの輸出販売（MTKN）／Web制作・システム開発</span></div>
 </div>
 </div></section>
@@ -172,7 +172,7 @@ body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#
 </div></section>
 <footer class="ftr"><div class="wrap">
 <div class="fgrid">
-<div><div class="fx ac gap10 mb12"><div class="logo fx ac jc fw8 fs14" style="width:28px;height:28px">K</div><span class="fw8 fs14" style="letter-spacing:.08em">KREVA</span></div><p class="fl" style="margin:0">合同会社クレバ<br>大阪府高槻市｜岡山｜アムステルダム</p></div>
+<div><div class="fx ac gap10 mb12"><div class="logo fx ac jc fw8 fs14" style="width:28px;height:28px">K</div><span class="fw8 fs14" style="letter-spacing:.08em">KREVA</span></div><p class="fl" style="margin:0">合同会社クレバ<br>大阪府高槻市｜岡山</p></div>
 <div><p class="fh2">事業</p><a class="fl" href="#biz">不動産事業</a><sc-if value="{{ akiyaLive }}" hint-placeholder-val="{{ false }}"><a class="fl" href="Akiya Search.dc.html">岡山県の空き家検索</a></sc-if><a class="fl" href="#mtkn">MTKN</a><a class="fl" href="#biz">Web制作・システム開発</a></div>
 <div><p class="fh2">会社</p><a class="fl" href="#about">会社概要</a><a class="fl" href="#contact">お問い合わせ</a><a class="fl" href="#">プライバシーポリシー</a></div>
 </div>
@@ -180,14 +180,16 @@ body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#
 </div></footer>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;akiyaLive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;公開設定&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#33568f&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#b3541e&quot;,&quot;#2f6f6a&quot;,&quot;#33568f&quot;],&quot;section&quot;:&quot;ブランド&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;akiyaLive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;公開設定&quot;},&quot;hideAmsterdam&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;公開設定&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#33568f&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#b3541e&quot;,&quot;#2f6f6a&quot;,&quot;#33568f&quot;],&quot;section&quot;:&quot;ブランド&quot;}}">
 class Component extends DCLogic {
   componentDidMount() { this.applyAccent(); }
   componentDidUpdate() { this.applyAccent(); }
   applyAccent() { document.body.style.setProperty('--accent', this.props.accent ?? '#b3541e'); }
   renderVals() {
     const live = this.props.akiyaLive ?? false;
+    const hide = this.props.hideAmsterdam ?? false;
     return {
+      showAms: !hide, hideAms: hide,
       akiyaLive: live,
       akiyaHref: live ? 'Akiya Search.dc.html' : '#biz',
       akiyaGo: live ? '空き家を検索する →' : '近日公開予定'

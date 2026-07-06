@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!--
+会社概要ページ（kreva.co.jp/company/ 実装移植用）
+■ セクション構成
+ 1 ヘッダー（共通） 2 ヒーロー（シンプル・リード文） 3 会社情報表
+ 4 3事業カード（各事業ページへリンク） 5 拠点（大阪・アムステルダム※hideAmsterdamトグルで非表示可）
+ 6 お問い合わせCTAバナー（accent淡色） 7 フッター
+■ TOKENS: accent #b3541e / ink #211d19 / sub #6f6a63 / line #e7e3dc / bg #faf9f6
+ Noto Sans JP・H1 34px/H2 24px w900・本文14px lh1.9・pill999px・カード16px・BP820px
+ ※代表者名の欄は任意（行を足しても崩れない表組み）
+-->
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#faf9f6;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.hdr{height:64px;padding:0 24px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:50}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff}
+.tag{font-size:11px;color:var(--sub)}
+.nl{color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:500;white-space:nowrap}
+.nl:hover{color:var(--ink)}
+.nl.now{color:var(--ink);font-weight:700}
+.lang{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;color:var(--sub);font-family:inherit}
+.cta{background:var(--accent);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+.cta:hover{filter:brightness(.94)}
+.big{padding:15px 36px;font-size:14px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.18em;color:var(--accent);margin-bottom:16px}
+.h1{font-size:34px;font-weight:900;line-height:1.5;margin:0 0 18px;text-wrap:pretty}
+.h2{font-size:24px;font-weight:900;margin:0;line-height:1.4}
+.lead{font-size:14px;line-height:1.9;margin:0;max-width:44em;color:#4c4841}
+.hero{padding:72px 0 56px;background:var(--bg)}
+.sec{padding:64px 0}
+.shead{margin-bottom:32px}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px 28px;max-width:760px}
+.tr{display:grid;grid-template-columns:160px 1fr;gap:12px;padding:16px 0;border-bottom:1px solid var(--line);font-size:13.5px;align-items:start}
+.tr:last-child{border-bottom:none}
+.tl{color:var(--sub)}
+.tv{font-weight:500;line-height:1.8}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.biz{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 26px;text-decoration:none;color:var(--ink);display:block;transition:box-shadow .18s,transform .18s}
+.biz:hover{box-shadow:0 10px 28px rgba(28,24,18,.12);transform:translateY(-2px)}
+.bk{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;display:block;margin-bottom:12px}
+.bt{font-size:17px;font-weight:700;margin:0 0 8px;line-height:1.5}
+.bp{font-size:12.5px;line-height:1.9;color:var(--sub);margin:0 0 14px}
+.bl{font-size:12.5px;font-weight:700;color:var(--accent)}
+.locs{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px}
+.loc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+.lk{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;display:block;margin-bottom:10px}
+.lt{font-size:15px;font-weight:700;margin:0 0 6px}
+.lp{font-size:12.5px;line-height:1.9;color:var(--sub);margin:0}
+.ctab{background:color-mix(in oklab,var(--accent) 9%,#fff);border:1px solid color-mix(in oklab,var(--accent) 22%,#fff);border-radius:20px;padding:44px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.ctah{font-size:22px;font-weight:900;margin:0 0 8px}
+.ctap{font-size:13px;color:#4c4841;margin:0;line-height:1.9;max-width:38em}
+.ftr{border-top:1px solid var(--line);background:var(--bg);padding:40px 0 28px}
+.fgrid{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px}
+.fl{font-size:12.5px;color:var(--sub);text-decoration:none;display:block;margin-bottom:10px}
+.fl:hover{color:var(--accent)}
+.fh2{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--ink);margin:0 0 12px}
+.fbase{font-size:11.5px;color:#96908a;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:820px){
+.navr{display:none}
+.hdr{padding:0 16px}
+.wrap{padding:0 16px}
+.hero{padding:44px 0}
+.h1{font-size:26px}
+.sec{padding:48px 0}
+.g3{grid-template-columns:1fr}
+.locs{grid-template-columns:1fr}
+.tr{grid-template-columns:104px 1fr}
+.tbl{padding:4px 20px}
+.ctab{padding:32px 24px}
+}
+</style>
+</helmet>
+<div class="page">
+<header class="hdr fx ac jb"><div class="fx ac gap10"><div class="logo fx ac jc fw8 fs16">K</div><div><div class="fw8 fs15" style="letter-spacing:.08em">KREVA</div><div class="tag">合同会社クレバ</div></div></div><nav class="navr fx ac gap16"><a class="nl" href="Kreva Home.dc.html">Home</a><a class="nl" href="Kreva Realestate.dc.html">不動産事業</a><a class="nl" href="Mtkn Page.dc.html">MTKN</a><a class="nl" href="Kreva Web.dc.html">Web制作・システム開発</a><a class="nl now" href="#">会社概要</a><a class="nl" href="Kreva Contact.dc.html">お問い合わせ</a></nav><div class="fx ac gap10"><button class="lang">EN</button><a class="cta" href="Kreva Contact.dc.html">お問合せ</a></div></header>
+<section class="hero"><div class="wrap">
+<div class="kicker">COMPANY</div><h1 class="h1">会社概要</h1><p class="lead">合同会社クレバ（KRÈVA LLC）は、大阪府高槻市を拠点に、不動産事業、衣料品輸出事業（MTKN）、Web制作・システム開発の三本柱で事業を展開しています。</p>
+</div></section>
+<section class="sec"><div class="wrap">
+<div class="shead"><div class="kicker">PROFILE</div><h2 class="h2">会社情報</h2></div>
+<div class="tbl">
+<div class="tr"><span class="tl">会社名</span><span class="tv">合同会社クレバ（KRÈVA LLC）</span></div>
+<div class="tr"><span class="tl">所在地</span><span class="tv">大阪府高槻市日吉台六番町18-12</span></div>
+<div class="tr"><span class="tl">設立日</span><span class="tv">2018年3月23日</span></div>
+<div class="tr"><span class="tl">資本金</span><span class="tv">100万円</span></div>
+<div class="tr"><span class="tl">事業内容</span><span class="tv">不動産の売買及び賃貸業<br>海外向け衣料輸出業（MTKN）<br>Web制作・システム開発</span></div>
+</div>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="shead"><div class="kicker">BUSINESS</div><h2 class="h2">事業</h2></div>
+<div class="g3">
+<a class="biz" href="Kreva Realestate.dc.html"><span class="bk mono">REAL ESTATE</span><h3 class="bt">不動産事業</h3><p class="bp">大阪府下を中心とした所有物件の賃貸・運営・管理。地域に根ざした管理で資産価値の維持・向上に取り組みます。</p><span class="bl">詳しく見る →</span></a>
+<a class="biz" href="Mtkn Page.dc.html"><span class="bk mono">MTKN</span><h3 class="bt">衣料品輸出事業</h3><sc-if value="{{ showAms }}" hint-placeholder-val="{{ true }}"><p class="bp">日本製ヴィンテージ・国産デニムをアムステルダム拠点から欧州へ。日本のものづくり文化を発信しています。</p></sc-if><sc-if value="{{ hideAms }}" hint-placeholder-val="{{ false }}"><p class="bp">日本製ヴィンテージ・国産デニムを欧州へ輸出・販売。日本のものづくり文化を発信しています。</p></sc-if><span class="bl">詳しく見る →</span></a>
+<a class="biz" href="Kreva Web.dc.html"><span class="bk mono">WEB & SYSTEMS</span><h3 class="bt">Web制作・システム開発</h3><p class="bp">AIを活用したホームページ制作・EC・在庫管理システムを、安価かつ迅速に構築します。</p><span class="bl">詳しく見る →</span></a>
+</div>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="shead"><div class="kicker">LOCATIONS</div><h2 class="h2">拠点</h2></div>
+<div class="locs">
+<div class="loc"><span class="lk mono">OSAKA — JAPAN</span><h3 class="lt">大阪（本社）</h3><p class="lp">大阪府高槻市日吉台六番町18-12<br>不動産事業・Web制作・システム開発の拠点</p></div>
+<sc-if value="{{ showAms }}" hint-placeholder-val="{{ true }}"><div class="loc"><span class="lk mono">AMSTERDAM — NL</span><h3 class="lt">アムステルダム</h3><p class="lp">衣料品輸出事業（MTKN）の欧州拠点<br>在庫管理・販売・現地コミュニティ活動</p></div></sc-if>
+</div>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="ctab"><div><h2 class="ctah">お問い合わせ</h2><p class="ctap">事業に関するご相談・ご質問は、お問い合わせフォームよりお気軽にご連絡ください。</p></div><a class="cta big" href="Kreva Contact.dc.html">お問い合わせフォームへ</a></div>
+</div></section>
+<footer class="ftr"><div class="wrap">
+<div class="fgrid">
+<div><div class="fx ac gap10 mb12"><div class="logo fx ac jc fw8 fs14" style="width:28px;height:28px">K</div><span class="fw8 fs14" style="letter-spacing:.08em">KREVA</span></div><p class="fl" style="margin:0">合同会社クレバ<br>大阪府高槻市｜岡山</p></div>
+<div><p class="fh2">事業</p><a class="fl" href="Kreva Realestate.dc.html">不動産事業</a><a class="fl" href="Mtkn Page.dc.html">MTKN</a><a class="fl" href="Kreva Web.dc.html">Web制作・システム開発</a></div>
+<div><p class="fh2">会社</p><a class="fl" href="#">会社概要</a><a class="fl" href="Kreva Contact.dc.html">お問い合わせ</a><a class="fl" href="#">プライバシーポリシー</a></div>
+</div>
+<div class="fbase"><span>© 2026 KREVA LLC</span><span>kreva.co.jp/company/</span></div>
+</div></footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;hideAmsterdam&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;公開設定&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const hide = this.props.hideAmsterdam ?? false;
+    return { showAms: !hide, hideAms: hide };
+  }
+}
+</script>
+</body>
+</html>

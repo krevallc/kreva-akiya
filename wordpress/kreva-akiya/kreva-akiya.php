@@ -3,7 +3,7 @@
  * Plugin Name:       KREVA 空き家検索
  * Plugin URI:        https://kreva.co.jp/akiya/
  * Description:        全国の空き家情報を検索・表示する機能。物件(CPT akiya)＋地図(Leaflet/地理院タイル)＋ハザード重畳＋規制/地価表示＋自社導線。取り込みはREST経由。
- * Version:           0.8.0
+ * Version:           0.9.0
  * Author:            KREVA LLC
  * Text Domain:       kreva-akiya
  * License:           GPL-2.0-or-later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // 直接アクセス禁止
 }
 
-define( 'KREVA_AKIYA_VERSION', '0.8.0' );
+define( 'KREVA_AKIYA_VERSION', '0.9.0' );
 define( 'KREVA_AKIYA_FILE', __FILE__ );
 define( 'KREVA_AKIYA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KREVA_AKIYA_URL', plugin_dir_url( __FILE__ ) );

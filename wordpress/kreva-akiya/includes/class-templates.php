@@ -63,9 +63,18 @@ class KREVA_Akiya_Templates {
 		if ( is_front_page() && apply_filters( 'kreva_akiya_render_home', true ) ) {
 			return KREVA_AKIYA_DIR . 'templates/home.php';
 		}
-		// MTKN事業ページ
-		if ( is_page( 'mtkn' ) && apply_filters( 'kreva_akiya_render_mtkn', true ) ) {
-			return KREVA_AKIYA_DIR . 'templates/mtkn.php';
+		// コーポレート各ページ（スラッグ→テンプレート）
+		$corp = array(
+			'mtkn'       => 'mtkn.php',
+			'realestate' => 'realestate.php',
+			'web'        => 'web.php',
+			'company'    => 'company.php',
+			'contact'    => 'contact.php',
+		);
+		foreach ( $corp as $slug => $tpl ) {
+			if ( is_page( $slug ) && apply_filters( 'kreva_akiya_render_' . $slug, true ) ) {
+				return KREVA_AKIYA_DIR . 'templates/' . $tpl;
+			}
 		}
 		// テーマが用意していればそれを尊重
 		if ( is_post_type_archive( KREVA_Akiya_CPT::POST_TYPE ) || is_tax( array( 'akiya_pref', 'akiya_city', 'akiya_type', 'akiya_status' ) ) ) {

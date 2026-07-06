@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!--
+不動産事業ページ（kreva.co.jp/realestate/ 実装移植用）
+■ セクション構成
+ 1 ヘッダー（共通） 2 ヒーロー（コピー＋実写スロット） 3 事業の特徴（3ポイント）
+ 4 管理物件（3カード：所在地・種別・構造） 5 今後の展望（読み物・bg）
+ 6 お問い合わせCTAバナー（accent淡色） 7 フッター
+■ TOKENS: accent #b3541e / ink #211d19 / sub #6f6a63 / line #e7e3dc / bg #faf9f6
+ Noto Sans JP・H1 34px/H2 24px w900・本文14px lh1.9・pill999px・カード16px・BP820px
+ ※空き家検索サービスへの言及なし（未公開）
+-->
+<helmet data-dc-atomics>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;--accent:#b3541e;--ink:#211d19;--sub:#6f6a63;--line:#e7e3dc;--bg:#faf9f6;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.hdr{height:64px;padding:0 24px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:50}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff}
+.tag{font-size:11px;color:var(--sub)}
+.nl{color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:500;white-space:nowrap}
+.nl:hover{color:var(--ink)}
+.nl.now{color:var(--ink);font-weight:700}
+.lang{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;color:var(--sub);font-family:inherit}
+.cta{background:var(--accent);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+.cta:hover{filter:brightness(.94)}
+.big{padding:15px 36px;font-size:14px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.18em;color:var(--accent);margin-bottom:16px}
+.h1{font-size:34px;font-weight:900;line-height:1.5;margin:0 0 18px;text-wrap:pretty}
+.h2{font-size:24px;font-weight:900;margin:0;line-height:1.4}
+.lead{font-size:14px;line-height:1.9;margin:0;max-width:44em;color:#4c4841}
+.hero{padding:64px 0}
+.hgrid{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
+.sec{padding:64px 0}
+.shead{margin-bottom:32px}
+.sdesc{font-size:13px;color:var(--sub);margin:8px 0 0;line-height:1.9}
+.p{font-size:14px;line-height:1.9;color:#4c4841;margin:0 0 14px;text-wrap:pretty}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 24px}
+.fno{font-size:11px;letter-spacing:.14em;color:var(--accent);font-weight:700;display:block;margin-bottom:12px}
+.ft{font-size:16px;font-weight:700;line-height:1.5;margin:0 0 8px}
+.fp{font-size:12.5px;line-height:1.9;color:var(--sub);margin:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:box-shadow .18s,transform .18s}
+.card:hover{box-shadow:0 10px 28px rgba(28,24,18,.12);transform:translateY(-2px)}
+.ph{height:200px;position:relative;background:repeating-linear-gradient(45deg,#edeae4 0 14px,#e3dfd7 14px 28px);display:flex;align-items:center;justify-content:center;color:#a49d92;font-size:11px;letter-spacing:.08em}
+.cb{padding:16px 20px 20px}
+.cl{font-size:11px;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:0 0 6px}
+.ct{font-size:15px;font-weight:700;margin:0 0 8px;line-height:1.5}
+.cm{font-size:12.5px;color:var(--sub);margin:0;line-height:1.9}
+.vision{background:var(--bg)}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.ctab{background:color-mix(in oklab,var(--accent) 9%,#fff);border:1px solid color-mix(in oklab,var(--accent) 22%,#fff);border-radius:20px;padding:44px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.ctah{font-size:22px;font-weight:900;margin:0 0 8px}
+.ctap{font-size:13px;color:#4c4841;margin:0;line-height:1.9;max-width:38em}
+.ftr{border-top:1px solid var(--line);background:var(--bg);padding:40px 0 28px}
+.fgrid{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;margin-bottom:28px}
+.fl{font-size:12.5px;color:var(--sub);text-decoration:none;display:block;margin-bottom:10px}
+.fl:hover{color:var(--accent)}
+.fh2{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--ink);margin:0 0 12px}
+.fbase{font-size:11.5px;color:#96908a;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:820px){
+.navr{display:none}
+.hdr{padding:0 16px}
+.wrap{padding:0 16px}
+.hero{padding:44px 0}
+.h1{font-size:26px}
+.sec{padding:48px 0}
+.hgrid{grid-template-columns:1fr;gap:32px}
+.g3{grid-template-columns:1fr}
+.vgrid{grid-template-columns:1fr;gap:24px}
+.ctab{padding:32px 24px}
+}
+</style>
+</helmet>
+<div class="page">
+<header class="hdr fx ac jb"><div class="fx ac gap10"><div class="logo fx ac jc fw8 fs16">K</div><div><div class="fw8 fs15" style="letter-spacing:.08em">KREVA</div><div class="tag">合同会社クレバ</div></div></div><nav class="navr fx ac gap16"><a class="nl" href="Kreva Home.dc.html">Home</a><a class="nl now" href="#">不動産事業</a><a class="nl" href="Mtkn Page.dc.html">MTKN</a><a class="nl" href="Kreva Web.dc.html">Web制作・システム開発</a><a class="nl" href="Kreva Company.dc.html">会社概要</a><a class="nl" href="Kreva Contact.dc.html">お問い合わせ</a></nav><div class="fx ac gap10"><button class="lang">EN</button><a class="cta" href="Kreva Contact.dc.html">お問合せ</a></div></header>
+<section class="hero"><div class="wrap hgrid">
+<div><div class="kicker">REAL ESTATE</div><h1 class="h1">地域に根ざした、<br>物件の運営と管理。</h1><p class="lead">KREVAは大阪府下を中心に、所有物件の賃貸・運営・管理を行っています。</p></div>
+<x-import component-from-global-scope="image-slot" from="./image-slot.js" id="re-hero" shape="rounded" radius="20" placeholder="物件写真（総社の外観・実素材あり）" style="width:100%;height:380px" hint-size="100%,380px"></x-import>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="shead"><div class="kicker">APPROACH</div><h2 class="h2">事業の特徴</h2></div>
+<div class="g3">
+<div class="feat"><span class="fno mono">01</span><h3 class="ft">所有物件の直接運営</h3><p class="fp">所有者として物件と向き合うからこそ、入居者と建物の双方に目の届く運営ができます。</p></div>
+<div class="feat"><span class="fno mono">02</span><h3 class="ft">地域に根ざした管理</h3><p class="fp">大阪・岡山それぞれの地域特性を踏まえ、現地に足を運びながら物件を管理しています。</p></div>
+<div class="feat"><span class="fno mono">03</span><h3 class="ft">資産価値の維持・向上</h3><p class="fp">修繕・リフォームの計画的な実施により、建物の価値を長く保つことを重視しています。</p></div>
+</div>
+</div></section>
+<section class="sec" style="padding-top:0"><div class="wrap">
+<div class="shead"><div class="kicker">PROPERTIES</div><h2 class="h2">管理物件</h2><p class="sdesc">現在運営・管理している物件の一例です。</p></div>
+<div class="g3">
+<article class="card"><div class="ph mono">物件写真｜東淀川区</div><div class="cb"><p class="cl mono">OSAKA</p><h3 class="ct">大阪市東淀川区の居宅</h3><p class="cm">種別：居宅（賃貸運営）<br>構造：鉄骨造2階建</p></div></article>
+<article class="card"><div class="ph mono">物件写真｜住吉区</div><div class="cb"><p class="cl mono">OSAKA</p><h3 class="ct">大阪市住吉区の戸建住宅</h3><p class="cm">種別：戸建住宅（賃貸運営）<br>構造：木造</p></div></article>
+<article class="card"><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="re-soja" shape="rect" placeholder="総社の物件外観（実素材あり）" style="width:100%;height:200px" hint-size="100%,200px"></x-import><div class="cb"><p class="cl mono">OKAYAMA</p><h3 class="ct">岡山県総社市の母屋・離れ</h3><p class="cm">種別：母屋＋離れ<br>離れは今後の活用を構想中</p></div></article>
+</div>
+</div></section>
+<section class="sec"><div class="wrap">
+<div class="ctab"><div><h2 class="ctah">お問い合わせ</h2><p class="ctap">不動産事業に関するご相談・ご質問は、お問い合わせフォームよりお気軽にご連絡ください。</p></div><a class="cta big" href="Kreva Contact.dc.html">お問い合わせフォームへ</a></div>
+</div></section>
+<footer class="ftr"><div class="wrap">
+<div class="fgrid">
+<div><div class="fx ac gap10 mb12"><div class="logo fx ac jc fw8 fs14" style="width:28px;height:28px">K</div><span class="fw8 fs14" style="letter-spacing:.08em">KREVA</span></div><p class="fl" style="margin:0">合同会社クレバ<br>大阪府高槻市｜岡山</p></div>
+<div><p class="fh2">事業</p><a class="fl" href="#">不動産事業</a><a class="fl" href="Mtkn Page.dc.html">MTKN</a><a class="fl" href="Kreva Web.dc.html">Web制作・システム開発</a></div>
+<div><p class="fh2">会社</p><a class="fl" href="Kreva Company.dc.html">会社概要</a><a class="fl" href="Kreva Contact.dc.html">お問い合わせ</a><a class="fl" href="#">プライバシーポリシー</a></div>
+</div>
+<div class="fbase"><span>© 2026 KREVA LLC</span><span>kreva.co.jp/realestate/</span></div>
+</div></footer>
+</div>
+</x-dc>
+</body>
+</html>
