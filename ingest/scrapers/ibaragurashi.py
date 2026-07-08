@@ -73,6 +73,11 @@ def parse_detail(session: PoliteSession, url: str) -> AkiyaRecord | None:
             if nxt:
                 town = nxt.get_text(strip=True)
             break
+    # 所在地欄は「西江原町」の場合と「井原市西江原町」等 市名込みの場合が混在する。
+    # 常に県市を前置するため、重複しないよう先頭の 岡山県／井原市 を剥がして正規化。
+    if town:
+        town = re.sub(r"^\s*(岡山県)?\s*(井原市)?\s*", "", town).strip()
+        town = town or None
     address = f"岡山県井原市{town}" if town else None
 
     # 価格
