@@ -81,7 +81,7 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => true ) )
 			<h2 class="kakiya-h3">市区町村から探す</h2>
 			<div class="kakiya-links">
 				<?php foreach ( (array) $cities as $t ) : ?>
-					<a class="kakiya-lnk" href="<?php echo esc_url( get_term_link( $t ) ); ?>"><?php echo esc_html( $t->name ); ?>の空き家（<?php echo (int) $t->count; ?>）</a>
+					<a class="kakiya-lnk" href="<?php echo esc_url( add_query_arg( 'city', $t->slug, get_post_type_archive_link( KREVA_Akiya_CPT::POST_TYPE ) ) ); ?>"><?php echo esc_html( $t->name ); ?>の空き家（<?php echo (int) $t->count; ?>）</a>
 				<?php endforeach; ?>
 			</div>
 

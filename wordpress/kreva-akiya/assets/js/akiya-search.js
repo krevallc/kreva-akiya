@@ -297,6 +297,18 @@
 				if (mapMode) setTimeout(function () { map.invalidateSize(); }, 60);
 			});
 		}
+		// URLパラメータ（市区町村ファセット等からの遷移）を初期フィルタに反映
+		try {
+			var usp = new URLSearchParams(window.location.search);
+			[['city', 'f-city'], ['type', 'f-type'], ['price', 'f-price']].forEach(function (pair) {
+				var v = usp.get(pair[0]);
+				if (!v) return;
+				var el = document.getElementById(pair[1]);
+				if (el && [].some.call(el.options, function (o) { return o.value === v; })) {
+					el.value = v;
+				}
+			});
+		} catch (e) {}
 		fetchItems();
 	});
 })();

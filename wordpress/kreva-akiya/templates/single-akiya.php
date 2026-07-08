@@ -62,7 +62,7 @@ while ( have_posts() ) :
 		<nav class="kakiya-bc" aria-label="パンくず">
 			<a href="<?php echo esc_url( get_post_type_archive_link( 'akiya' ) ); ?>">空き家検索</a> ›
 			<?php if ( $city_term ) : ?>
-				<a href="<?php echo esc_url( get_term_link( $city_term ) ); ?>"><?php echo esc_html( $city_term->name ); ?></a> ›
+				<a href="<?php echo esc_url( add_query_arg( 'city', $city_term->slug, get_post_type_archive_link( 'akiya' ) ) ); ?>"><?php echo esc_html( $city_term->name ); ?></a> ›
 			<?php endif; ?>
 			<span><?php the_title(); ?></span>
 		</nav>
