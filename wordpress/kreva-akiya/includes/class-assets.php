@@ -70,6 +70,7 @@ class KREVA_Akiya_Assets {
 			$config['postId']   = $post_id;
 			wp_localize_script( 'kreva-akiya-single', 'KREVA_AKIYA', $config );
 		} else {
+			$config['iju'] = kreva_akiya_city_iju();
 			wp_enqueue_script( 'kreva-akiya-search', KREVA_AKIYA_URL . 'assets/js/akiya-search.js', array( 'leaflet' ), KREVA_AKIYA_VERSION, true );
 			wp_localize_script( 'kreva-akiya-search', 'KREVA_AKIYA', $config );
 		}

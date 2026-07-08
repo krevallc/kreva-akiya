@@ -256,6 +256,49 @@ function kreva_akiya_external_banks( $city = '' ) {
 }
 
 /**
+ * 市区町村ごとの移住・定住情報リンク（岡山県公式移住ポータル「おかやま晴れの国ぐらし」）。
+ * 検索を市区町村で絞ったとき、その自治体の移住相談窓口・主な支援制度（空き家改修/購入補助等）・
+ * お知らせへ誘導するカードを表示するために使う。ポータル各ページに自治体公式サイトへのリンクや
+ * 最新の支援制度がまとまっており、県が維持管理するため情報が古くなりにくい。
+ * キーは akiya_city タームの「名称」（例: 高梁市）。
+ */
+function kreva_akiya_city_iju() {
+	return array(
+		'portal_base' => 'https://www.okayama-iju.jp/info-municipality/',
+		'news_url'    => 'https://www.okayama-iju.jp/municipality/news.html',
+		'pages'       => array(
+			'岡山市'     => '01okayama.html',
+			'倉敷市'     => '02kurashiki.html',
+			'津山市'     => '03tsuyama.html',
+			'玉野市'     => '04tamano.html',
+			'笠岡市'     => '05kasaoka.html',
+			'井原市'     => '06ibara.html',
+			'総社市'     => '07soja.html',
+			'高梁市'     => '08takahashi.html',
+			'新見市'     => '09niimi.html',
+			'備前市'     => '10bizen.html',
+			'瀬戸内市'   => '11setouchi.html',
+			'赤磐市'     => '12akaiwa.html',
+			'真庭市'     => '13maniwa.html',
+			'美作市'     => '14mimasaka.html',
+			'浅口市'     => '15asakuchi.html',
+			'和気町'     => '16wake.html',
+			'早島町'     => '17hayashima.html',
+			'里庄町'     => '18satosho.html',
+			'矢掛町'     => '19yakage.html',
+			'新庄村'     => '20shinjo.html',
+			'鏡野町'     => '21kagamino.html',
+			'勝央町'     => '22shoo.html',
+			'奈義町'     => '23nagi.html',
+			'西粟倉村'   => '24nishiawakura.html',
+			'久米南町'   => '25kumenan.html',
+			'美咲町'     => '26misaki.html',
+			'吉備中央町' => '27kibichuo.html',
+		),
+	);
+}
+
+/**
  * 地図フロントに渡す共通設定（地理院タイル・初期表示・問い合わせ先）。
  */
 function kreva_akiya_map_config() {

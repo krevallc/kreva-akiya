@@ -123,6 +123,32 @@
 		});
 		setCount(items.length);
 		render(items);
+		renderIju();
+	}
+
+	/* 市区町村で絞ったとき、その自治体の移住・定住情報（県公式ポータル）への誘導カードを表示 */
+	function renderIju() {
+		var box = document.getElementById('kakiya-iju');
+		if (!box) return;
+		var iju = CFG.iju || {};
+		var pages = iju.pages || {};
+		var sel = document.getElementById('f-city');
+		var name = '';
+		if (sel && sel.value && sel.selectedIndex > 0) {
+			name = (sel.options[sel.selectedIndex].textContent || '').replace(/（.*$/, '').trim();
+		}
+		var page = name && pages[name];
+		if (!page) { box.hidden = true; box.innerHTML = ''; return; }
+		var url = (iju.portal_base || 'https://www.okayama-iju.jp/info-municipality/') + page;
+		var news = iju.news_url || 'https://www.okayama-iju.jp/municipality/news.html';
+		box.innerHTML =
+			'<div class="kakiya-iju-h">' + esc(name) + 'の移住・定住情報</div>' +
+			'<p class="kakiya-iju-p">' + esc(name) + 'への移住相談窓口や、空き家の改修・購入補助などの主な支援制度、最新のお知らせは、岡山県の公式移住ポータル「おかやま晴れの国ぐらし」でご確認いただけます。</p>' +
+			'<div class="kakiya-iju-links">' +
+				'<a class="kakiya-iju-a is-primary" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(name) + 'の支援制度・相談窓口を見る ↗</a>' +
+				'<a class="kakiya-iju-a" href="' + esc(news) + '" target="_blank" rel="noopener">市町村の移住ニュース ↗</a>' +
+			'</div>';
+		box.hidden = false;
 	}
 
 	function render(items) {
@@ -297,16 +323,21 @@
 				if (mapMode) setTimeout(function () { map.invalidateSize(); }, 60);
 			});
 		}
-		// URLパラメータ（市区町村ファセット等からの遷移）を初期フィルタに反映
+		// URLパラメータ（市区町村ファセット等からの遷移）を初期フィルタに反映。
+		// タームスラッグは日本語がパーセントエンコードされている（例 %e9%ab%98…）ため、
+		// URL値（デコード済み）とオプション値をデコードして突き合わせる。
 		try {
 			var usp = new URLSearchParams(window.location.search);
+			var dec = function (s) { try { return decodeURIComponent(s); } catch (e) { return s; } };
 			[['city', 'f-city'], ['type', 'f-type'], ['price', 'f-price']].forEach(function (pair) {
 				var v = usp.get(pair[0]);
 				if (!v) return;
 				var el = document.getElementById(pair[1]);
-				if (el && [].some.call(el.options, function (o) { return o.value === v; })) {
-					el.value = v;
-				}
+				if (!el) return;
+				var opt = [].filter.call(el.options, function (o) {
+					return o.value === v || dec(o.value) === dec(v);
+				})[0];
+				if (opt) el.value = opt.value;
 			});
 		} catch (e) {}
 		fetchItems();

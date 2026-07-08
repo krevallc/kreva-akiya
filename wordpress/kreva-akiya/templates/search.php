@@ -15,6 +15,16 @@ kreva_akiya_header();
 $cities = get_terms( array( 'taxonomy' => 'akiya_city', 'hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC' ) );
 $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => true ) );
 ?>
+<style>
+.kakiya-iju{margin:0 0 14px;padding:14px 16px;border:1px solid #e3e0d8;border-radius:12px;background:#faf8f3}
+.kakiya-iju-h{font-weight:700;font-size:15px;margin:0 0 4px;color:#2f2a24}
+.kakiya-iju-p{font-size:12.5px;line-height:1.7;color:#6b6459;margin:0 0 10px}
+.kakiya-iju-links{display:flex;flex-wrap:wrap;gap:8px}
+.kakiya-iju-a{display:inline-flex;align-items:center;gap:4px;padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;text-decoration:none;border:1px solid #d8d3c8;color:#2f2a24;background:#fff;transition:background .15s}
+.kakiya-iju-a:hover{background:#f0ece3}
+.kakiya-iju-a.is-primary{background:#2f6f4f;border-color:#2f6f4f;color:#fff}
+.kakiya-iju-a.is-primary:hover{background:#255c41}
+</style>
 <div class="kakiya-page2">
 
 	<!-- フィルタピルバー -->
@@ -65,6 +75,7 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => true ) )
 					<option value="land_desc">土地が広い順</option>
 				</select>
 			</div>
+			<div id="kakiya-iju" class="kakiya-iju" hidden></div>
 			<div id="kakiya-cards" class="kakiya-cards" aria-live="polite"></div>
 		</main>
 	</div>
