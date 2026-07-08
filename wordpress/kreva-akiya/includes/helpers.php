@@ -266,34 +266,139 @@ function kreva_akiya_city_iju() {
 	return array(
 		'portal_base' => 'https://www.okayama-iju.jp/info-municipality/',
 		'news_url'    => 'https://www.okayama-iju.jp/municipality/news.html',
-		'pages'       => array(
-			'岡山市'     => '01okayama.html',
-			'倉敷市'     => '02kurashiki.html',
-			'津山市'     => '03tsuyama.html',
-			'玉野市'     => '04tamano.html',
-			'笠岡市'     => '05kasaoka.html',
-			'井原市'     => '06ibara.html',
-			'総社市'     => '07soja.html',
-			'高梁市'     => '08takahashi.html',
-			'新見市'     => '09niimi.html',
-			'備前市'     => '10bizen.html',
-			'瀬戸内市'   => '11setouchi.html',
-			'赤磐市'     => '12akaiwa.html',
-			'真庭市'     => '13maniwa.html',
-			'美作市'     => '14mimasaka.html',
-			'浅口市'     => '15asakuchi.html',
-			'和気町'     => '16wake.html',
-			'早島町'     => '17hayashima.html',
-			'里庄町'     => '18satosho.html',
-			'矢掛町'     => '19yakage.html',
-			'新庄村'     => '20shinjo.html',
-			'鏡野町'     => '21kagamino.html',
-			'勝央町'     => '22shoo.html',
-			'奈義町'     => '23nagi.html',
-			'西粟倉村'   => '24nishiawakura.html',
-			'久米南町'   => '25kumenan.html',
-			'美咲町'     => '26misaki.html',
-			'吉備中央町' => '27kibichuo.html',
+		// キーは akiya_city タームの名称。page=県ポータルの該当ページ、subsidies=主な支援制度の要点。
+		// 要点は岡山県移住ポータル掲載情報の抜粋（年度で改定され得るため詳細・最新は各ページで確認）。
+		'cities'      => array(
+			'岡山市'     => array( 'page' => '01okayama.html', 'subsidies' => array(
+				'中古住宅の購入・リフォーム補助（県外からの移住・50歳未満）',
+				'民間賃貸の家賃補助（入居後 最大4カ月分）',
+				'就職面接・インターンの交通費 半額補助',
+			) ),
+			'倉敷市'     => array( 'page' => '02kurashiki.html', 'subsidies' => array(
+				'お試し住宅（1泊1,000円・まち中／せとうち古民家）',
+				'移住の面接・住まい探しの交通費補助',
+				'移住就労サポートデスク（転職・就職相談 無料）',
+			) ),
+			'津山市'     => array( 'page' => '03tsuyama.html', 'subsidies' => array(
+				'空き家活用定住補助 ― 購入 上限30万／改修 上限60万',
+				'トライアルステイ（お試し住宅・最大2万円）',
+				'移住コンシェルジュのオーダーメイド移住ツアー',
+			) ),
+			'玉野市'     => array( 'page' => '04tamano.html', 'subsidies' => array(
+				'認定移住者向け お試し滞在助成',
+				'就職活動の交通費助成',
+			) ),
+			'笠岡市'     => array( 'page' => '05kasaoka.html', 'subsidies' => array(
+				'空き家バンク（90件以上を公開）',
+				'オーダーメイド移住体感ツアー・お試し住宅',
+			) ),
+			'井原市'     => array( 'page' => '06ibara.html', 'subsidies' => array(
+				'移住者の住宅新築等補助 上限100万',
+				'中古住宅活用補助 ― 購入 上限100万／改修 上限100万／賃借 上限24万',
+				'お試し住宅（1日1,000円）',
+			) ),
+			'総社市'     => array( 'page' => '07soja.html', 'subsidies' => array(
+				'空き家リフォーム助成（1/2・上限30万）',
+				'空き家改修の起業支援補助（1/2・上限50万）',
+			) ),
+			'高梁市'     => array( 'page' => '08takahashi.html', 'subsidies' => array(
+				'空き家情報バンク活用助成 ― 購入 上限80万／改修 上限100万／家財処分 上限20万',
+				'お試し暮らし助成（滞在の宿泊費等）',
+				'移住コンシェルジュ・地域サポート団体が伴走',
+			) ),
+			'新見市'     => array( 'page' => '09niimi.html', 'subsidies' => array(
+				'空き家活用推進補助（購入・改修・家財整理）',
+				'お試し暮らし（1泊2,000円・上限30泊/年度）',
+				'移住交流支援センター（アドバイザー常駐）',
+			) ),
+			'備前市'     => array( 'page' => '10bizen.html', 'subsidies' => array(
+				'空家活用促進補助 ― 購入費の1/10・上限50万',
+				'家賃補助（月5万・最長36カ月）',
+				'0〜5歳児の保育料 無料',
+			) ),
+			'瀬戸内市'   => array( 'page' => '11setouchi.html', 'subsidies' => array(
+				'定住促進補助（分譲宅地購入 価格の3割）',
+				'リモートワーク体験プラン（交通費補助）',
+			) ),
+			'赤磐市'     => array( 'page' => '12akaiwa.html', 'subsidies' => array(
+				'空き家改修費補助（1/2）',
+				'新婚世帯の家賃補助（月1万・最大12カ月）',
+				'高校生まで医療費 無料',
+			) ),
+			'真庭市'     => array( 'page' => '13maniwa.html', 'subsidies' => array(
+				'空き家の購入・改修補助（1/3・上限100万）',
+				'空き家バンク物件の家財撤去補助（3/4・上限20万）',
+				'新婚さんバックアップ（住宅取得 上限100万 ほか）',
+			) ),
+			'美作市'     => array( 'page' => '14mimasaka.html', 'subsidies' => array(
+				'移住定住住宅補助 ― 新築 上限130万／中古 上限50万',
+				'新婚さんバックアップ（上限60万）',
+				'新規就農補助（上限150万・最大3年）',
+			) ),
+			'浅口市'     => array( 'page' => '15asakuchi.html', 'subsidies' => array(
+				'空き家情報バンク（市サイト・移住ポータルで公開）',
+				'満18歳まで 子ども医療費 全額助成',
+				'保育料無償化ほか 子育て支援',
+			) ),
+			'和気町'     => array( 'page' => '16wake.html', 'subsidies' => array(
+				'移住相談員が常駐・現地ガイド',
+				'移住下見の宿泊費補助（2/3・上限4,000円/泊）',
+				'移住活動用の自動車を無料貸出',
+			) ),
+			'早島町'     => array( 'page' => '17hayashima.html', 'subsidies' => array(
+				'空き家利活用助成（改修・家財処分 最大50万）',
+				'起業家支援（最大40万）',
+				'満18歳まで 子ども医療費助成',
+			) ),
+			'里庄町'     => array( 'page' => '18satosho.html', 'subsidies' => array(
+				'幼稚園・保育園の保育料 無料化',
+				'学童保育・預かり保育',
+				'満18歳まで 子ども医療費助成',
+			) ),
+			'矢掛町'     => array( 'page' => '19yakage.html', 'subsidies' => array(
+				'空き家改修補助（1/2・上限100万）',
+				'定住促進助成（新築 建築費の1/10・最大200万）',
+				'結婚新生活支援（最大60万）',
+			) ),
+			'新庄村'     => array( 'page' => '20shinjo.html', 'subsidies' => array(
+				'保育料・給食費 無料（保育園〜中学）',
+				'高校卒業まで 医療費 無料',
+				'転入奨励金10万・引越費助成 上限10万',
+			) ),
+			'鏡野町'     => array( 'page' => '21kagamino.html', 'subsidies' => array(
+				'定住促進 空き家改修補助（1/2・上限50万）',
+				'町産材の家づくり補助（新築 最大200万）',
+				'新卒等ふるさと就職奨励金 10万',
+			) ),
+			'勝央町'     => array( 'page' => '22shoo.html', 'subsidies' => array(
+				'定住促進補助 ― 改修 最大70万／購入 最大100万',
+				'移住支援金（就業・起業 世帯100万・個人60万）',
+				'お試し住宅・宿泊助成',
+			) ),
+			'奈義町'     => array( 'page' => '23nagi.html', 'subsidies' => array(
+				'空家購入補助 最大100万',
+				'新築住宅補助 最大100万',
+				'高校卒業まで 医療費 無料',
+			) ),
+			'西粟倉村'   => array( 'page' => '24nishiawakura.html', 'subsidies' => array(
+				'ローカルベンチャー（起業型 地域おこし協力隊）',
+				'教育移住のサポート',
+				'地域おこし協力隊（企業研修型・行政連携型）',
+			) ),
+			'久米南町'   => array( 'page' => '25kumenan.html', 'subsidies' => array(
+				'空き家流動化補助 ― 購入 上限20万／改修 上限50万（若者要件で上限100万）',
+				'民間賃貸の家賃助成（4割・上限1.5万/月）',
+				'就農支援（研修・奨励金・補助）',
+			) ),
+			'美咲町'     => array( 'page' => '26misaki.html', 'subsidies' => array(
+				'お試し暮らし住宅（1日1,000円）',
+				'高校生まで医療費無料・出産祝金・水道基本料助成',
+			) ),
+			'吉備中央町' => array( 'page' => '27kibichuo.html', 'subsidies' => array(
+				'空き家活用支援制度（奨励金・補助金）',
+				'住みたいまち 定住奨励金',
+				'お試し暮らし支援制度',
+			) ),
 		),
 	);
 }

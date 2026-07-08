@@ -19,6 +19,11 @@ $types  = get_terms( array( 'taxonomy' => 'akiya_type', 'hide_empty' => true ) )
 .kakiya-iju{margin:0 0 14px;padding:14px 16px;border:1px solid #e3e0d8;border-radius:12px;background:#faf8f3}
 .kakiya-iju-h{font-weight:700;font-size:15px;margin:0 0 4px;color:#2f2a24}
 .kakiya-iju-p{font-size:12.5px;line-height:1.7;color:#6b6459;margin:0 0 10px}
+.kakiya-iju-sub-h{font-size:11.5px;font-weight:600;color:#245c41;letter-spacing:.02em;margin:0 0 6px}
+.kakiya-iju-sub{margin:0 0 8px;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.kakiya-iju-sub li{font-size:12.5px;line-height:1.5;color:#3d382f;padding-left:16px;position:relative}
+.kakiya-iju-sub li:before{content:"◆";color:#2f6f4f;position:absolute;left:0;font-size:9px;top:3px}
+.kakiya-iju-note{font-size:11.5px;line-height:1.6;color:#8a8377;margin:0 0 10px}
 .kakiya-iju-links{display:flex;flex-wrap:wrap;gap:8px}
 .kakiya-iju-a{display:inline-flex;align-items:center;gap:4px;padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;text-decoration:none;border:1px solid #d8d3c8;color:#2f2a24;background:#fff;transition:background .15s}
 .kakiya-iju-a:hover{background:#f0ece3}

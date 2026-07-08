@@ -131,19 +131,25 @@
 		var box = document.getElementById('kakiya-iju');
 		if (!box) return;
 		var iju = CFG.iju || {};
-		var pages = iju.pages || {};
+		var cities = iju.cities || {};
 		var sel = document.getElementById('f-city');
 		var name = '';
 		if (sel && sel.value && sel.selectedIndex > 0) {
 			name = (sel.options[sel.selectedIndex].textContent || '').replace(/（.*$/, '').trim();
 		}
-		var page = name && pages[name];
-		if (!page) { box.hidden = true; box.innerHTML = ''; return; }
-		var url = (iju.portal_base || 'https://www.okayama-iju.jp/info-municipality/') + page;
+		var c = name && cities[name];
+		if (!c) { box.hidden = true; box.innerHTML = ''; return; }
+		var url = (iju.portal_base || 'https://www.okayama-iju.jp/info-municipality/') + c.page;
 		var news = iju.news_url || 'https://www.okayama-iju.jp/municipality/news.html';
+		var subs = '';
+		if (c.subsidies && c.subsidies.length) {
+			subs = '<div class="kakiya-iju-sub-h">主な支援制度</div><ul class="kakiya-iju-sub">' +
+				c.subsidies.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') +
+				'</ul><p class="kakiya-iju-note">※要点の抜粋です。金額・要件は改定され得るため、最新・詳細は下記の公式ページでご確認ください。</p>';
+		}
 		box.innerHTML =
 			'<div class="kakiya-iju-h">' + esc(name) + 'の移住・定住情報</div>' +
-			'<p class="kakiya-iju-p">' + esc(name) + 'への移住相談窓口や、空き家の改修・購入補助などの主な支援制度、最新のお知らせは、岡山県の公式移住ポータル「おかやま晴れの国ぐらし」でご確認いただけます。</p>' +
+			subs +
 			'<div class="kakiya-iju-links">' +
 				'<a class="kakiya-iju-a is-primary" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(name) + 'の支援制度・相談窓口を見る ↗</a>' +
 				'<a class="kakiya-iju-a" href="' + esc(news) + '" target="_blank" rel="noopener">市町村の移住ニュース ↗</a>' +
