@@ -51,20 +51,38 @@ def _area(text: str) -> float | None:
     return float(m.group(1)) if m else None
 
 
+_EXCLUDE = re.compile(r"申込|申請|届出|Q&A|ＱＡ|パンフ|変更")
+
+
+def _pick_pdf(html: str) -> str | None:
+    """HTMLから物件リストPDF（アンカー文言が「空き家情報（…）」）のhrefを返す。
+    BeautifulSoup非依存の素朴な正規表現（get_textの差異に左右されない）。"""
+    # 例: <a href="/uploaded/attachment/35473.pdf">空き家情報（令和8年6月11日） [PDFファイル／4.5MB]</a>
+    for m in re.finditer(r'href="([^"]+?\.pdf)"[^>]*>\s*(空き家情報[^<]*)', html, re.I):
+        href, txt = m.group(1), m.group(2)
+        if "（" in txt and not _EXCLUDE.search(txt):
+            return href if href.startswith("http") else BASE + href
+    # 予備：BeautifulSoupでアンカーテキストから
+    soup = BeautifulSoup(html, "html.parser")
+    for a in soup.find_all("a"):
+        href = a.get("href", "")
+        txt = a.get_text(" ", strip=True)
+        if href.lower().endswith(".pdf") and txt.startswith("空き家情報") and "（" in txt and not _EXCLUDE.search(txt):
+            return href if href.startswith("http") else BASE + href
+    return None
+
+
 def find_pdf_url(session: PoliteSession) -> str | None:
     """親ページから物件リストPDF（「空き家情報（令和…）」）のURLを取得。"""
     r = session.get(LIST_PAGE)
     if r is None:
+        print("[tamano] 親ページ取得失敗（robots/接続）")
         return None
-    soup = BeautifulSoup(r.text, "html.parser")
-    for a in soup.find_all("a"):
-        href = a.get("href", "")
-        if not href.lower().endswith(".pdf"):
-            continue
-        txt = a.get_text(" ", strip=True)
-        # 物件一覧は「空き家情報（令和…）」。申込書・変更届・Q&A・パンフ等は除外
-        if txt.startswith("空き家情報") and "（" in txt and not re.search(r"申込|申請|届出|Q&A|ＱＡ|パンフ|変更", txt):
-            return href if href.startswith("http") else BASE + href
+    url = _pick_pdf(r.text)
+    if url:
+        return url
+    n_pdf = r.text.lower().count(".pdf")
+    print(f"[tamano] PDFリンク未検出（HTML {len(r.text)}B・pdf出現 {n_pdf}）")
     return None
 
 
@@ -160,6 +178,9 @@ def parse_pdf(data: bytes, *, date_str: str | None = None) -> list[AkiyaRecord]:
 
 def scrape(session: PoliteSession | None = None, *, limit: int | None = None) -> list[AkiyaRecord]:
     session = session or PoliteSession()
+    # 連絡先明示のUAは維持しつつ、WAF等が期待する標準ヘッダを補う（取得失敗対策）
+    session.session.headers.setdefault("Accept", "text/html,application/xhtml+xml,application/pdf,*/*")
+    session.session.headers.setdefault("Accept-Language", "ja,en;q=0.8")
     url = find_pdf_url(session)
     if not url:
         print("[tamano] 物件リストPDFのリンクが見つかりませんでした。")
