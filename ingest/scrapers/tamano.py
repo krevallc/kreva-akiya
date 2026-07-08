@@ -81,17 +81,27 @@ def _pick_pdf(html: str) -> str | None:
     return None
 
 
+def _html(r) -> str:
+    """レスポンスをUTF-8で明示デコード。玉野はContent-Typeにcharsetが無く、
+    requestsが既定のlatin-1で解釈して日本語が壊れるため（実体はUTF-8）。"""
+    try:
+        return r.content.decode("utf-8")
+    except UnicodeDecodeError:
+        return r.content.decode(r.apparent_encoding or "cp932", errors="replace")
+
+
 def find_pdf_url(session: PoliteSession) -> str | None:
     """親ページから物件リストPDF（「空き家情報（令和…）」）のURLを取得。"""
     r = session.get(LIST_PAGE)
     if r is None:
         print("[tamano] 親ページ取得失敗（robots/接続）")
         return None
-    url = _pick_pdf(r.text)
+    html = _html(r)
+    url = _pick_pdf(html)
     if url:
         return url
-    n_pdf = r.text.lower().count(".pdf")
-    print(f"[tamano] PDFリンク未検出（HTML {len(r.text)}B・pdf出現 {n_pdf}）")
+    n_pdf = html.lower().count(".pdf")
+    print(f"[tamano] PDFリンク未検出（HTML {len(html)}B・pdf出現 {n_pdf}）")
     return None
 
 
