@@ -23,7 +23,7 @@ import poc  # _load_dotenv を借用
 from wp_client import WPClient, AkiyaRecord
 from reinfolib import ReinfolibClient
 from scrapers.http import PoliteSession
-from scrapers import ok_smile, ibaragurashi, takahashi, niimi, kibichuo, yakage, misaki, shinjo
+from scrapers import ok_smile, ibaragurashi, takahashi, niimi, kibichuo, yakage, misaki, shinjo, tamano
 
 OUT_DIR = pathlib.Path(__file__).parent / "out"
 
@@ -86,7 +86,7 @@ def apply_slugs(records: list[AkiyaRecord]) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description="KREVA 空き家 取り込み")
     ap.add_argument("--source", default="ok_smile",
-                    choices=["ok_smile", "ibaragurashi", "takahashi", "niimi", "kibichuo", "yakage", "misaki", "shinjo", "all"],
+                    choices=["ok_smile", "ibaragurashi", "takahashi", "niimi", "kibichuo", "yakage", "misaki", "shinjo", "tamano", "all"],
                     help="取り込み元")
     ap.add_argument("--cities", default="priority", help="priority | all | カンマ区切りコード")
     ap.add_argument("--kinds", default="buy", help="buy,rent（カンマ区切り）")
@@ -130,6 +130,8 @@ def main() -> int:
         records += misaki.scrape(session, limit=args.limit)
     if args.source in ("shinjo", "all"):
         records += shinjo.scrape(session, limit=args.limit)
+    if args.source in ("tamano", "all"):
+        records += tamano.scrape(session, limit=args.limit)
     print(f"  → {len(records)} 件 収集")
 
     # last_checked
@@ -201,6 +203,8 @@ def fully_scraped_sources(args) -> set[str]:
         out.add(misaki.SOURCE_NAME)
     if args.source in ("shinjo", "all"):
         out.add(shinjo.SOURCE_NAME)
+    if args.source in ("tamano", "all"):
+        out.add(tamano.SOURCE_NAME)
     return out
 
 

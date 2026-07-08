@@ -1,3 +1,4 @@
 # エンリッチ層PoC＋取り込み 依存パッケージ（最小構成）
 requests>=2.31
 beautifulsoup4>=4.12
+pdfplumber>=0.11  # 玉野市の空き家情報PDF（1物件1ページ）をパース
