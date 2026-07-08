@@ -54,21 +54,30 @@ def _area(text: str) -> float | None:
 _EXCLUDE = re.compile(r"申込|申請|届出|Q&A|ＱＡ|パンフ|変更")
 
 
+def _norm(href: str) -> str:
+    return href if href.startswith("http") else BASE + href
+
+
 def _pick_pdf(html: str) -> str | None:
-    """HTMLから物件リストPDF（アンカー文言が「空き家情報（…）」）のhrefを返す。
-    BeautifulSoup非依存の素朴な正規表現（get_textの差異に左右されない）。"""
-    # 例: <a href="/uploaded/attachment/35473.pdf">空き家情報（令和8年6月11日） [PDFファイル／4.5MB]</a>
-    for m in re.finditer(r'href="([^"]+?\.pdf)"[^>]*>\s*(空き家情報[^<]*)', html, re.I):
-        href, txt = m.group(1), m.group(2)
-        if "（" in txt and not _EXCLUDE.search(txt):
-            return href if href.startswith("http") else BASE + href
-    # 予備：BeautifulSoupでアンカーテキストから
+    """HTMLから物件リストPDF（アンカー文言に「空き家情報（…）」を含む）のhrefを返す。
+    アンカー全体を取ってタグ除去後に部分一致で判定（内部マークアップに左右されない）。"""
+    cands: list[tuple[str, str]] = []
+    for m in re.finditer(r'<a\b[^>]*?href="([^"]+?\.pdf)"[^>]*>(.*?)</a>', html, re.I | re.S):
+        href = m.group(1)
+        text = re.sub(r"<[^>]+>", "", m.group(2))
+        text = re.sub(r"\s+", " ", text).strip()
+        cands.append((href, text))
+        if "空き家情報" in text and "（" in text and not _EXCLUDE.search(text):
+            return _norm(href)
+    # 予備：BeautifulSoup（部分一致で判定）
     soup = BeautifulSoup(html, "html.parser")
     for a in soup.find_all("a"):
         href = a.get("href", "")
         txt = a.get_text(" ", strip=True)
-        if href.lower().endswith(".pdf") and txt.startswith("空き家情報") and "（" in txt and not _EXCLUDE.search(txt):
-            return href if href.startswith("http") else BASE + href
+        if href.lower().endswith(".pdf") and "空き家情報" in txt and "（" in txt and not _EXCLUDE.search(txt):
+            return _norm(href)
+    if cands:
+        print("[tamano] PDF候補:", [(h.rsplit("/", 1)[-1], t[:28]) for h, t in cands][:8])
     return None
 
 
