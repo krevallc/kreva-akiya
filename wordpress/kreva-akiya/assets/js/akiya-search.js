@@ -74,7 +74,7 @@
 
 	/* ---------- データ取得・表示 ---------- */
 	function collectFilters() {
-		var params = { per_page: 500 };
+		var params = { per_page: 2000 };
 		document.querySelectorAll('select[data-filter]').forEach(function (el) {
 			if (el.value !== '') params[el.getAttribute('data-filter')] = el.value;
 		});

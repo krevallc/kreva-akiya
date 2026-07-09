@@ -144,7 +144,7 @@
 	function loadNearby() {
 		var box = document.getElementById('kakiya-nearby');
 		if (!box || !CFG.restSearch || p.lat == null) return;
-		fetch(CFG.restSearch + '?per_page=500', { headers: { 'Accept': 'application/json' } })
+		fetch(CFG.restSearch + '?per_page=2000', { headers: { 'Accept': 'application/json' } })
 			.then(function (r) { return r.json(); })
 			.then(function (data) {
 				var items = (data.items || [])
