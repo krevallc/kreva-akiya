@@ -40,6 +40,20 @@ TITLE_RE = re.compile(r"物件情報（([^：]+)：([^）]+)）No\.([0-9]+)")
 _ERA = (("令和", 2018), ("平成", 1988), ("昭和", 1925))
 
 
+def _html(r) -> str:
+    """レスポンスをUTF-8で明示デコード。
+
+    詳細ページは Content-Type が `text/html`（charset無し）で返るため、requests が
+    RFC既定の latin-1 とみなして日本語が化ける。結果 h3 ラベル一致が全滅して
+    価格・面積・構造などが全て None になっていた（玉野と同じ罠）。
+    実体は meta charset=utf-8 なので UTF-8 を明示する。
+    """
+    try:
+        return r.content.decode("utf-8")
+    except UnicodeDecodeError:
+        return r.content.decode(r.apparent_encoding or "cp932", errors="replace")
+
+
 def _build_year(text: str) -> int | None:
     """'昭和51年' / '平成26年' / '2003年' → 西暦。不明なら None。"""
     if not text:
@@ -96,12 +110,13 @@ def list_detail_urls(session: PoliteSession, max_pages: int = 25) -> list[tuple[
         r = session.get(f"{LIST_URL}?search=1&page={page}")
         if r is None:
             break
+        html = _html(r)
         if total is None:
-            m = re.search(r"([0-9]+)件中", r.text)
+            m = re.search(r"([0-9]+)件中", html)
             if m:
                 total = int(m.group(1))
                 print(f"[kasaoka] 一覧総数（空き地含む）: {total}件")
-        soup = BeautifulSoup(r.text, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
         anchors = soup.select("div.result_list_box a[href]")
         if not anchors:
             break
@@ -126,7 +141,7 @@ def parse_detail(
     r = session.get(url)
     if r is None:
         return None
-    soup = BeautifulSoup(r.text, "html.parser")
+    soup = BeautifulSoup(_html(r), "html.parser")
 
     town = _normalize_town(_field(soup, "所在地") or "") or town_hint
     address = f"岡山県笠岡市{town}"
