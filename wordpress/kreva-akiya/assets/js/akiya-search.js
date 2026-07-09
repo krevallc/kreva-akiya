@@ -8,6 +8,7 @@
 
 	var PAGE_SIZE = 12;
 	var map, markersLayer, byId = {}, rawItems = [], allItems = [], shownCount = 0;
+	var overlapGroups = []; // 同一座標グループ（ズーム毎に配置を再計算する）
 	var toggles = { newonly: false, has_photo: false, kuiki: false, hazard_free: false };
 	var bboxMode = null; // 「この範囲で再検索」時の bbox 文字列
 
@@ -38,6 +39,7 @@
 		L.control.layers(bases, hazardLayers(), { collapsed: true }).addTo(map);
 		L.control.attribution({ prefix: false }).addAttribution(CFG.attribution || '').addTo(map);
 		markersLayer = L.layerGroup().addTo(map);
+		map.on('zoomend', applySpread); // ズームに応じて重なりピンの展開半径を再計算
 		// 地図を動かしたら「この範囲で再検索」を表示
 		map.on('moveend zoomend', function () {
 			var chip = document.getElementById('kakiya-bbox');
@@ -157,32 +159,54 @@
 		box.hidden = false;
 	}
 
-	/**
-	 * 完全に同じ座標の物件（元サイトが番地非公開で大字の代表点しか無いケース）は
-	 * ピンが重なって1本にしか見えないため、同一座標グループを小さな円状に散らす。
-	 * 元座標自体が概算のため半径は控えめ（既定30m・件数が多いほど微増）。
-	 * 戻り値: { 物件id: [lat, lng] }（重なりの無い物件は含めない）
+	/* ---------- 同一座標ピンの重なり解消 ----------
+	 * 元サイトが番地を公開しておらず大字の代表点しか取れない物件は座標が完全一致し、
+	 * ピンが重なって1本にしか見えない。同一座標グループを円状に配置して分離する。
+	 *
+	 * 価格ラベルは幅60〜75px程度あるため、固定の地理的オフセットではズームにより
+	 * 広がりすぎ／狭すぎになる。そこでズームごとに「画面上の間隔」を目標に半径を再計算し、
+	 * ただし実座標からのずれは SPREAD_MAX_M で頭打ちにする（低ズームで実位置から
+	 * 大きく離れて誤解を招くのを防ぐ）。元座標自体が大字の代表点＝概算のため、
+	 * この程度のずれは同一大字の範囲に収まる。
 	 */
-	function spreadOverlaps(items) {
-		var groups = {}, out = {};
+	var SPREAD_TARGET_PX = 64;  // 隣接ピンの目標間隔（px）
+	var SPREAD_MIN_PX = 30;     // 半径の下限（px）
+	var SPREAD_MAX_PX = 90;     // 半径の上限（px）
+	var SPREAD_MAX_M = 120;     // 実座標からの最大ずれ（m）
+
+	function metersPerPixel(lat, zoom) {
+		return 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, zoom);
+	}
+
+	function buildOverlapGroups(items) {
+		var g = {};
 		items.forEach(function (it) {
 			if (it.lat == null || it.lng == null) return;
 			var key = Number(it.lat).toFixed(5) + ',' + Number(it.lng).toFixed(5);
-			(groups[key] = groups[key] || []).push(it);
+			(g[key] = g[key] || []).push(it);
 		});
-		Object.keys(groups).forEach(function (key) {
-			var g = groups[key];
-			if (g.length < 2) return;
-			var lat = Number(g[0].lat), lng = Number(g[0].lng);
-			var radius = 30 + Math.max(0, g.length - 8) * 4; // メートル
-			var dLat = radius / 111320;
-			var dLng = radius / (111320 * Math.cos(lat * Math.PI / 180) || 1);
+		return Object.keys(g).map(function (k) { return g[k]; })
+			.filter(function (a) { return a.length > 1; });
+	}
+
+	function applySpread() {
+		if (!overlapGroups.length || !map) return;
+		var zoom = map.getZoom();
+		overlapGroups.forEach(function (g) {
+			var lat = Number(g[0].lat), lng = Number(g[0].lng), n = g.length;
+			// n個を円周に等間隔で置いたとき隣接間隔が目標pxになる半径
+			var rPx = SPREAD_TARGET_PX / (2 * Math.sin(Math.PI / n));
+			rPx = Math.min(SPREAD_MAX_PX, Math.max(SPREAD_MIN_PX, rPx));
+			var r = Math.min(SPREAD_MAX_M, rPx * metersPerPixel(lat, zoom));
+			var dLat = r / 111320;
+			var dLng = r / (111320 * Math.cos(lat * Math.PI / 180) || 1);
 			g.forEach(function (it, i) {
-				var a = (2 * Math.PI * i) / g.length;
-				out[it.id] = [lat + dLat * Math.sin(a), lng + dLng * Math.cos(a)];
+				var mk = byId[it.id];
+				if (!mk) return;
+				var a = (2 * Math.PI * i) / n;
+				mk.setLatLng([lat + dLat * Math.sin(a), lng + dLng * Math.cos(a)]);
 			});
 		});
-		return out;
 	}
 
 	function render(items) {
@@ -198,15 +222,15 @@
 			return;
 		}
 		var bounds = [];
-		var offsets = spreadOverlaps(items);
 		items.forEach(function (it) {
-			var pos = offsets[it.id] || [it.lat, it.lng];
-			var mk = L.marker(pos, { icon: priceIcon(it), riseOnHover: true });
+			var mk = L.marker([it.lat, it.lng], { icon: priceIcon(it), riseOnHover: true });
 			mk.bindPopup(popupHtml(it), { minWidth: 236, maxWidth: 236, className: 'kakiya-popup' });
 			mk.addTo(markersLayer);
 			byId[it.id] = mk;
-			bounds.push(pos);
+			bounds.push([it.lat, it.lng]);
 		});
+		overlapGroups = buildOverlapGroups(items);
+		applySpread();
 		appendCards();
 		if (bounds.length && !bboxMode) {
 			map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
