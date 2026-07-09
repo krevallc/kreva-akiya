@@ -160,7 +160,8 @@ class KREVA_Akiya_REST {
 		$args = array(
 			'post_type'      => KREVA_Akiya_CPT::POST_TYPE,
 			'post_status'    => 'publish',
-			'posts_per_page' => min( 500, max( 1, (int) ( $req->get_param( 'per_page' ) ?: 200 ) ) ),
+			// 上限2000（地図は全件を一括描画するため。総件数増に対する余裕を確保）
+			'posts_per_page' => min( 2000, max( 1, (int) ( $req->get_param( 'per_page' ) ?: 200 ) ) ),
 			'no_found_rows'  => true,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
