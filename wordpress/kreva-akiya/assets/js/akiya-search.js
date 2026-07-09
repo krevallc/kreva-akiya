@@ -157,6 +157,34 @@
 		box.hidden = false;
 	}
 
+	/**
+	 * 完全に同じ座標の物件（元サイトが番地非公開で大字の代表点しか無いケース）は
+	 * ピンが重なって1本にしか見えないため、同一座標グループを小さな円状に散らす。
+	 * 元座標自体が概算のため半径は控えめ（既定30m・件数が多いほど微増）。
+	 * 戻り値: { 物件id: [lat, lng] }（重なりの無い物件は含めない）
+	 */
+	function spreadOverlaps(items) {
+		var groups = {}, out = {};
+		items.forEach(function (it) {
+			if (it.lat == null || it.lng == null) return;
+			var key = Number(it.lat).toFixed(5) + ',' + Number(it.lng).toFixed(5);
+			(groups[key] = groups[key] || []).push(it);
+		});
+		Object.keys(groups).forEach(function (key) {
+			var g = groups[key];
+			if (g.length < 2) return;
+			var lat = Number(g[0].lat), lng = Number(g[0].lng);
+			var radius = 30 + Math.max(0, g.length - 8) * 4; // メートル
+			var dLat = radius / 111320;
+			var dLng = radius / (111320 * Math.cos(lat * Math.PI / 180) || 1);
+			g.forEach(function (it, i) {
+				var a = (2 * Math.PI * i) / g.length;
+				out[it.id] = [lat + dLat * Math.sin(a), lng + dLng * Math.cos(a)];
+			});
+		});
+		return out;
+	}
+
 	function render(items) {
 		allItems = items;
 		shownCount = 0;
@@ -170,12 +198,14 @@
 			return;
 		}
 		var bounds = [];
+		var offsets = spreadOverlaps(items);
 		items.forEach(function (it) {
-			var mk = L.marker([it.lat, it.lng], { icon: priceIcon(it), riseOnHover: true });
+			var pos = offsets[it.id] || [it.lat, it.lng];
+			var mk = L.marker(pos, { icon: priceIcon(it), riseOnHover: true });
 			mk.bindPopup(popupHtml(it), { minWidth: 236, maxWidth: 236, className: 'kakiya-popup' });
 			mk.addTo(markersLayer);
 			byId[it.id] = mk;
-			bounds.push([it.lat, it.lng]);
+			bounds.push(pos);
 		});
 		appendCards();
 		if (bounds.length && !bboxMode) {
