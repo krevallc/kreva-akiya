@@ -24,7 +24,7 @@ on:
       source:
         description: "取り込み元"
         type: choice
-        options: [all, ok_smile, ibaragurashi, takahashi, niimi, kibichuo, yakage, misaki, shinjo, tamano]
+        options: [all, ok_smile, ibaragurashi, takahashi, niimi, kibichuo, yakage, misaki, shinjo, tamano, kasaoka]
         default: all
       cities:
         description: "対象自治体（priority / all / カンマ区切りコード）"
